@@ -43,6 +43,13 @@ const protectedRoutes: RouteObject = {
                   .default,
               }),
             },
+            {
+              path: "units",
+              lazy: async () => ({
+                Component: (await import("@/app/pages/dashboards/units"))
+                  .default,
+              }),
+            },
           ],
         },
         
