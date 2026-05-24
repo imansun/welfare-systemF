@@ -18,6 +18,14 @@ export const dashboards: NavigationTree = {
       transKey: "nav.dashboards.home",
       icon: "dashboards.home",
     },
+    {
+      id: "dashboards.companies",
+      path: path(ROOT_DASHBOARDS, "/companies"),
+      type: "item",
+      title: "Companies",
+      transKey: "nav.dashboards.companies",
+      icon: "dashboards.companies",
+    },
     
   ],
 };
