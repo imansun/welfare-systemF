@@ -17,10 +17,12 @@ import {
   CreateItemPayload,
   UpdateItemPayload,
 } from "@/app/services/endpoints/items";
+import { getUnits, UnitItem } from "@/app/services/endpoints/units";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { Select } from "@/components/ui/Form";
 
 type ModalMode = "create" | "edit" | null;
 
@@ -44,6 +46,21 @@ export default function Items() {
   const [formErrors, setFormErrors] = useState<Partial<CreateItemPayload>>({});
   const [formLoading, setFormLoading] = useState(false);
   const [formModalState, setFormModalState] = useState<"pending" | "success" | "error">("pending");
+  const [units, setUnits] = useState<UnitItem[]>([]);
+  const [unitsLoading, setUnitsLoading] = useState(false);
+
+  const fetchUnits = async () => {
+    try {
+      setUnitsLoading(true);
+      const response = await getUnits();
+      const data = Array.isArray(response) ? response : response.data || [];
+      setUnits(data);
+    } catch (error) {
+      console.error("Failed to fetch units:", error);
+    } finally {
+      setUnitsLoading(false);
+    }
+  };
 
   const fetchItems = async () => {
     try {
@@ -60,6 +77,7 @@ export default function Items() {
 
   useEffect(() => {
     fetchItems();
+    fetchUnits();
   }, []);
 
   const handleDeleteClick = (id: string) => {
@@ -122,6 +140,10 @@ export default function Items() {
     setFormMode(null);
     setFormData({ name: "", unitId: "", isActive: true });
     setFormErrors({});
+  };
+
+  const handleUnitChange = (unitId: string) => {
+    setFormData({ ...formData, unitId });
   };
 
   const validateForm = (): boolean => {
@@ -314,13 +336,20 @@ export default function Items() {
               disabled={formLoading}
             />
 
-            <Input
-              label="شناسه واحد"
+            <Select
+              label="واحد"
               value={formData.unitId}
-              onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
+              onChange={handleUnitChange}
+              options={[
+                { value: "", label: "انتخاب واحد..." },
+                ...units.map((unit) => ({
+                  value: unit.id,
+                  label: `${unit.name} (${unit.shortName})`,
+                })),
+              ]}
               error={formErrors.unitId}
-              disabled={formLoading}
-              placeholder="مثال: 3ee2f6e1-da60-4fa0-b8a4-8e0193dd6f81"
+              disabled={formLoading || unitsLoading}
+              loading={unitsLoading}
             />
 
             <div className="flex items-center gap-3">
