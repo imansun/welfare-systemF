@@ -1,3 +1,4 @@
+```gitignore
 # Dependencies
 node_modules/
 
@@ -11,43 +12,54 @@ env/
 venv/
 .venv/
 .ENV
-.ENV.*
-.python-version
-.python_history
-.pytest_cache/
-.mypy_cache/
-.coverage
-coverage/
-htmlcov/
+.ENV.local
+.env
+.env.local
+.env.*
 
 # Build outputs
 dist/
 build/
 *.egg-info/
-.eggs/
-
-# Environment
-.env
-.env.local
-.env.*
-.env.local.*
 
 # Editors
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
+
+# Logs
+*.log
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Temp files
+*.tmp
+*.temp
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
 *.out
 
-# Compressed files
+# Testing
+.pytest_cache/
+.mypy_cache/
+.nyc_output/
+coverage/
+
+# Compression
 *.zip
 *.gz
 *.tar
@@ -70,3 +82,4 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+```

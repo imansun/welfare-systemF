@@ -371,9 +371,9 @@ export default function Items() {
               <Button
                 color="primary"
                 type="submit"
-                loading={formLoading}
+                disabled={formLoading}
               >
-                ذخیره
+                {formLoading ? "در حال ذخیره..." : "ذخیره"}
               </Button>
             </div>
           </form>
