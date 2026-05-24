@@ -2,7 +2,8 @@
   "nav": {
     "dashboards": {
       "dashboards": "Dashboards",
-      "home": "Home"
+      "home": "Home",
+      "companies": "Companies"
     },
     "settings": {
       "settings": "Settings",

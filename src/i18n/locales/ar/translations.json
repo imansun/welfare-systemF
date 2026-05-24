@@ -2,7 +2,8 @@
   "nav": {
     "dashboards": {
       "dashboards": "لوحات التحكم",
-      "home": "الرئيسية"
+      "home": "الرئيسية",
+      "companies": "الشركات"
     },
     "settings": {
       "settings": "الإعدادات",
