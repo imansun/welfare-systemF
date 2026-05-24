@@ -3,7 +3,8 @@
     "dashboards": {
       "dashboards": "لوحات التحكم",
       "home": "الرئيسية",
-      "companies": "الشركات"
+      "companies": "الشركات",
+      "units": "الوحدات"
     },
     "settings": {
       "settings": "الإعدادات",

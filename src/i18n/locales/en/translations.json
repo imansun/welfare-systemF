@@ -3,7 +3,8 @@
     "dashboards": {
       "dashboards": "Dashboards",
       "home": "Home",
-      "companies": "Companies"
+      "companies": "Companies",
+      "units": "Units"
     },
     "settings": {
       "settings": "Settings",

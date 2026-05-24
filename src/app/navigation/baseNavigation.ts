@@ -22,6 +22,14 @@ export const baseNavigationObj: Record<string, NavigationTree> = {
     transKey: "nav.dashboards.companies",
     icon: "dashboards.companies",
   },
+  units: {
+    id: "units",
+    type: "item",
+    path: "/dashboards/units",
+    title: "Units",
+    transKey: "nav.dashboards.units",
+    icon: "dashboards.units",
+  },
 };
 
 /**
