@@ -1,6 +1,6 @@
 // src\app\navigation\icons.ts
 import { TbPalette } from "react-icons/tb";
-import { HomeIcon, UserIcon, GlobeAltIcon, CubeIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, UserIcon, GlobeAltIcon, CubeIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
 import { ElementType } from "react";
 
 import DashboardsIcon from "@/assets/dualicons/dashboards.svg?react";
@@ -12,6 +12,7 @@ export const navigationIcons: Record<string, ElementType> = {
 
   "dashboards.home": HomeIcon,
   "dashboards.units": CubeIcon,
+  "dashboards.items": ArchiveBoxIcon,
 
   general: GlobeAltIcon,
 

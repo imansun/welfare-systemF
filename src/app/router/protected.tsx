@@ -50,6 +50,13 @@ const protectedRoutes: RouteObject = {
                   .default,
               }),
             },
+            {
+              path: "items",
+              lazy: async () => ({
+                Component: (await import("@/app/pages/dashboards/items"))
+                  .default,
+              }),
+            },
           ],
         },
         
