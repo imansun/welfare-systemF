@@ -1,62 +1,22 @@
-```gitignore
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
 # Dependencies
 node_modules/
+venv/
+.venv/
 
-# Build outputs
-dist/
-build/
-.next/
-out/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
+*.env.*
 
-# IDE specific
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Python related (if applicable)
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-
-# Temporary files
-*.tmp
-*.temp
-.DS_Store
-Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Testing
-.nyc_output/
-coverage/lcov-report/
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Debug
-*.stackdump
-
-# System
-ehthumbs.db
-Icon?
-apidoc/
-docs/_build/
-```
