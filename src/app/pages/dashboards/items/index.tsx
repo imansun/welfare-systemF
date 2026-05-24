@@ -341,7 +341,7 @@ export default function Items() {
               value={formData.unitId}
               onChange={handleUnitChange}
               options={[
-                { value: "", label: "انتخاب واحد..." },
+                { value: "", label: unitsLoading ? "در حال بارگذاری..." : "انتخاب واحد..." },
                 ...units.map((unit) => ({
                   value: unit.id,
                   label: `${unit.name} (${unit.shortName})`,
@@ -349,7 +349,6 @@ export default function Items() {
               ]}
               error={formErrors.unitId}
               disabled={formLoading || unitsLoading}
-              loading={unitsLoading}
             />
 
             <div className="flex items-center gap-3">
