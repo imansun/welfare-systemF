@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "dashboards": {
+      "dashboards": "داشبوردها",
+      "home": "خانه",
+      "users": "کاربران",
+      "logs": "لاگ‌ها",
+      "categories": "دسته‌بندی‌ها",
+      "collections": "کالکشن‌ها",
+      "tags": "تگ‌ها",
+      "brands": "برندها",
+      "attributes": "ویژگی‌ها",
+      "companies": "شرکت‌ها",
+      "units": "واحدها",
+      "items": "آیتم‌ها",
+      "employees": "کارکنان",
+      "periods": "دوره‌ها",
+      "imports": "ایمپورت‌ها",
+      "invoices": "فاکتورها"
+    },
+    "settings": {
+      "settings": "تنظیمات",
+      "general": "عمومی",
+      "appearance": "ظاهر"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+import { TbPalette } from "react-icons/tb";
+import {
+  HomeIcon,
+  UserIcon,
+  GlobeAltIcon,
+  CubeIcon,
+  ArchiveBoxIcon,
+} from "@heroicons/react/24/outline";
+import { ElementType } from "react";
+
+import DashboardsIcon from "@/assets/dualicons/dashboards.svg?react";
+import SettingIcon from "@/assets/dualicons/setting.svg?react";
+import ToolsIcon from "@/assets/nav-icons/utility.svg?react";
+
+export const navigationIcons: Record<string, ElementType> = {
+  dashboards: DashboardsIcon,
+  settings: SettingIcon,
+  tools: ToolsIcon,
+
+  "dashboards.home": HomeIcon,
+  "dashboards.units": CubeIcon,
+  "dashboards.items": ArchiveBoxIcon,
+
+  general: GlobeAltIcon,
+
+  "settings.general": UserIcon,
+  "settings.appearance": TbPalette,
+
+  "tools.converter": ToolsIcon,
+  "tools.calculator": ToolsIcon,
+  "tools.qr-generator": ToolsIcon,
+};
