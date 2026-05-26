@@ -1269,6 +1269,18 @@ export default function Companies() {
                                 color="primary"
                                 isGlow={hover && !active}
                                 disabled={formLoading}
+                                onClick={(e) => {
+                                  console.log("========================================");
+                                  console.log("🔵 SAVE BUTTON CLICKED!");
+                                  console.log("========================================");
+                                  console.log("📋 Form Mode:", formMode);
+                                  console.log("🆔 Selected Company ID:", selectedCompanyId);
+                                  console.log("📝 Form Data:", formData);
+                                  console.log("⏳ Form Loading:", formLoading);
+                                  console.log("🔴 Form Modal State:", formModalState);
+                                  console.log("❌ Form Errors:", formErrors);
+                                  console.log("========================================");
+                                }}
                               >
                                 {formLoading && (
                                   <Spinner className="mr-2 size-4 border-2" />
