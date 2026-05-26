@@ -713,7 +713,7 @@ export default function Employees() {
                   <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-dark-500">
                     <p className="flex items-center gap-2 text-xs text-gray-500 dark:text-dark-400">
                       <CalendarIcon className="size-4" />
-                      <span>آخرین به‌روزرسانی: ۱۴۰۳</span>
+                      <span>آخرین به‌روزرسانی: 1405</span>
                     </p>
                     <HeadlessButton as={Fragment}>
                       {({ hover, active }) => (
