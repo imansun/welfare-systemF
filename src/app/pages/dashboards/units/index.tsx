@@ -1,6 +1,6 @@
 // src/app/pages/dashboards/units/index.tsx
 
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/components/shared/Page";
 import { Button } from "@/components/ui/Button";
@@ -246,7 +246,10 @@ export default function Units() {
           <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
             واحدها
           </h2>
-          <Button color="primary" onClick={handleOpenCreateModal}>افزودن واحد جدید</Button>
+
+          <Button color="primary" onClick={handleOpenCreateModal}>
+            افزودن واحد جدید
+          </Button>
         </div>
 
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-dark-500 dark:bg-dark-700">
@@ -260,16 +263,17 @@ export default function Units() {
                 <Th>عملیات</Th>
               </Tr>
             </THead>
+
             <TBody>
               {loading ? (
                 <Tr>
-                  <Td colSpan={5} className="text-center py-4">
+                  <Td colSpan={5} className="py-4 text-center">
                     در حال بارگذاری...
                   </Td>
                 </Tr>
               ) : units.length === 0 ? (
                 <Tr>
-                  <Td colSpan={5} className="text-center py-4">
+                  <Td colSpan={5} className="py-4 text-center">
                     هیچ واحدی یافت نشد
                   </Td>
                 </Tr>
@@ -284,7 +288,11 @@ export default function Units() {
                       </Badge>
                     </Td>
                     <Td>
-                      {new Date(unit.createdAt).toLocaleDateString("fa-IR")}
+                      {unit.createdAt
+                        ? new Date(unit.createdAt).toLocaleDateString(
+                            "fa-IR"
+                          )
+                        : "-"}
                     </Td>
                     <Td>
                       <div className="flex gap-2">
@@ -296,6 +304,7 @@ export default function Units() {
                         >
                           ویرایش
                         </Button>
+
                         <Button
                           variant="flat"
                           color="error"
@@ -314,7 +323,6 @@ export default function Units() {
         </div>
       </div>
 
-      {/* Delete Confirm Modal */}
       <ConfirmModal
         show={deleteModalOpen}
         onClose={handleCloseDeleteModal}
@@ -324,7 +332,8 @@ export default function Units() {
         messages={{
           pending: {
             title: "آیا مطمئن هستید؟",
-            description: "آیا از حذف این واحد مطمئن هستید؟ این عملیات قابل بازگشت نیست.",
+            description:
+              "آیا از حذف این واحد مطمئن هستید؟ این عملیات قابل بازگشت نیست.",
             actionText: "حذف",
           },
           success: {
@@ -340,7 +349,6 @@ export default function Units() {
         }}
       />
 
-      {/* Create/Edit Modal */}
       <Transition
         appear
         show={formModalOpen}
