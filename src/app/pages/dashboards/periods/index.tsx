@@ -34,6 +34,8 @@ import {
   CreatePeriodPackageItemPayload,
   UpdatePeriodPackageItemPayload,
 } from "@/app/services/endpoints/periods";
+import { Combobox } from "@/components/shared/form/StyledCombobox";
+import { ItemItem, getItems } from "@/app/services/endpoints/items";
 
 type ModalMode = "create" | "edit" | null;
 type ModalState = "pending" | "success" | "error";
@@ -151,12 +153,15 @@ export default function Periods() {
     useState<DistributionPeriod | null>(null);
   const [packageItems, setPackageItems] = useState<PeriodPackageItem[]>([]);
   const [packageItemsLoading, setPackageItemsLoading] = useState(false);
+  const [availableItems, setAvailableItems] = useState<ItemItem[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
 
   const [packageItemFormMode, setPackageItemFormMode] =
     useState<ModalMode>(null);
   const [editingPackageItemId, setEditingPackageItemId] = useState<
     string | null
   >(null);
+  const [selectedItem, setSelectedItem] = useState<ItemItem | null>(null);
   const [packageItemFormData, setPackageItemFormData] =
     useState<PackageItemFormData>({
       itemId: "",
@@ -187,6 +192,7 @@ export default function Periods() {
   const resetPackageItemForm = () => {
     setPackageItemFormMode(null);
     setEditingPackageItemId(null);
+    setSelectedItem(null);
     setPackageItemFormData({
       itemId: "",
       quantity: "",
@@ -194,6 +200,22 @@ export default function Periods() {
     });
     setPackageItemFormErrors({});
     setPackageItemFormState("pending");
+  };
+
+  const fetchAvailableItems = async () => {
+    console.log("📦 [ITEMS] Fetching available items...");
+    try {
+      setItemsLoading(true);
+      const data = await getItems();
+      console.log("✅ [ITEMS] Items fetched successfully:", data);
+      setAvailableItems(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("❌ [ITEMS] Failed to fetch items:", error);
+      setAvailableItems([]);
+    } finally {
+      setItemsLoading(false);
+      console.log("🏁 [ITEMS] Fetch items completed, loading set to false");
+    }
   };
 
   const fetchPeriods = async () => {
@@ -472,8 +494,9 @@ export default function Periods() {
     resetPackageItemForm();
     setPackageItems([]);
     setPackageItemsModalOpen(true);
-    console.log("🔄 [PACKAGE ITEMS MODAL] Fetching package items...");
+    console.log("🔄 [PACKAGE ITEMS MODAL] Fetching package items and available items...");
     await fetchPackageItems(period.id);
+    await fetchAvailableItems();
     console.log("✅ [PACKAGE ITEMS MODAL] Package items modal opened successfully");
   };
 
@@ -499,6 +522,13 @@ export default function Periods() {
     setEditingPackageItemId(packageItem.id);
     setPackageItemFormState("pending");
     setPackageItemFormErrors({});
+    
+    // Find the corresponding item from availableItems
+    const foundItem = availableItems.find(item => item.id === packageItem.item?.id);
+    if (foundItem) {
+      setSelectedItem(foundItem);
+    }
+    
     setPackageItemFormData({
       itemId: packageItem.item?.id ?? "",
       quantity: packageItem.quantity ?? "",
@@ -511,6 +541,20 @@ export default function Periods() {
     if (packageItemFormLoading) return;
 
     resetPackageItemForm();
+  };
+
+  const handleSelectedItemChange = (item: ItemItem) => {
+    setSelectedItem(item);
+    setPackageItemFormData((prev) => ({
+      ...prev,
+      itemId: item.id,
+    }));
+    if (packageItemFormErrors.itemId) {
+      setPackageItemFormErrors((prev) => ({
+        ...prev,
+        itemId: undefined,
+      }));
+    }
   };
 
   const handlePackageItemInputChange = (
@@ -533,8 +577,8 @@ export default function Periods() {
   const validatePackageItemForm = (): boolean => {
     const errors: PackageItemFormErrors = {};
 
-    if (!packageItemFormData.itemId.trim()) {
-      errors.itemId = "شناسه کالا الزامی است";
+    if (!selectedItem) {
+      errors.itemId = "انتخاب کالا الزامی است";
     }
 
     if (!packageItemFormData.quantity.trim()) {
@@ -1055,14 +1099,16 @@ export default function Periods() {
                 className="space-y-4"
               >
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <Input
-                    label="شناسه کالا"
-                    value={packageItemFormData.itemId}
-                    onChange={(e) =>
-                      handlePackageItemInputChange("itemId", e.target.value)
-                    }
+                  <Combobox
+                    data={availableItems}
+                    displayField="name"
+                    value={selectedItem}
+                    onChange={handleSelectedItemChange}
+                    placeholder="لطفاً کالا را انتخاب کنید"
+                    label="کالا"
+                    searchFields={["name"]}
                     error={packageItemFormErrors.itemId}
-                    disabled={packageItemFormLoading}
+                    disabled={itemsLoading || packageItemFormLoading}
                   />
 
                   <Input
