@@ -620,6 +620,7 @@ export default function Companies() {
         debugLog("updateCompany id:", selectedCompanyId);
         debugLog("updateCompany payload:", payload);
 
+        // FIX: Ensure we're calling updateCompany with correct parameters
         const response = await updateCompany(selectedCompanyId, payload);
 
         debugLog("updateCompany response:", response);
@@ -630,6 +631,7 @@ export default function Companies() {
           formMode,
           selectedCompanyId,
         });
+        toast.error("خطا در ذخیره اطلاعات");
         return;
       }
 
@@ -638,6 +640,11 @@ export default function Companies() {
       debugLog("calling fetchCompanies after save");
       await fetchCompanies();
       debugLog("fetchCompanies after save finished");
+      
+      // Close drawer after successful save
+      setTimeout(() => {
+        handleCloseFormDrawer();
+      }, 1000);
     } catch (error: any) {
       debugError("handleSubmitForm failed:", error);
       debugError("save error message:", error?.message);
@@ -1184,6 +1191,8 @@ export default function Companies() {
                     <form
                       onSubmit={(event) => {
                         event.preventDefault();
+                        event.stopPropagation();
+                        debugLog("Form submitted manually");
                         handleSubmitForm();
                       }}
                       className="space-y-4"
@@ -1273,6 +1282,8 @@ export default function Companies() {
                                 isGlow={hover && !active}
                                 disabled={formLoading}
                                 onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
                                   console.log("========================================");
                                   console.log("🔵 SAVE BUTTON CLICKED!");
                                   console.log("========================================");
@@ -1283,7 +1294,8 @@ export default function Companies() {
                                   console.log("🔴 Form Modal State:", formModalState);
                                   console.log("❌ Form Errors:", formErrors);
                                   console.log("========================================");
-                                  // handleSubmitForm will be called by form onSubmit
+                                  debugLog("Save button clicked, calling handleSubmitForm");
+                                  handleSubmitForm();
                                 }}
                               >
                                 {formLoading && (
