@@ -1,4 +1,5 @@
 // src/app/pages/dashboards/units/index.tsx
+
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/components/shared/Page";
@@ -18,41 +19,63 @@ import {
   UpdateUnitPayload,
 } from "@/app/services/endpoints/units";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
-import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
 
 type ModalMode = "create" | "edit" | null;
+type ModalState = "pending" | "success" | "error";
+
+type UnitFormData = CreateUnitPayload;
+type UnitFormErrors = Partial<Record<keyof CreateUnitPayload, string>>;
 
 export default function Units() {
   const { t } = useTranslation();
+
   const [units, setUnits] = useState<UnitItem[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
-  const [modalState, setModalState] = useState<"pending" | "success" | "error">("pending");
+  const [deletingUnitId, setDeletingUnitId] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<ModalState>("pending");
   const [confirmLoading, setConfirmLoading] = useState(false);
-  
-  // Form modal states
+
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<ModalMode>(null);
-  const [formData, setFormData] = useState<CreateUnitPayload>({
+  const [editingUnitId, setEditingUnitId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<UnitFormData>({
     name: "",
     shortName: "",
     isActive: true,
   });
-  const [formErrors, setFormErrors] = useState<Partial<CreateUnitPayload>>({});
+  const [formErrors, setFormErrors] = useState<UnitFormErrors>({});
   const [formLoading, setFormLoading] = useState(false);
-  const [formModalState, setFormModalState] = useState<"pending" | "success" | "error">("pending");
+  const [formModalState, setFormModalState] = useState<ModalState>("pending");
+
+  const resetForm = () => {
+    setFormMode(null);
+    setEditingUnitId(null);
+    setFormData({
+      name: "",
+      shortName: "",
+      isActive: true,
+    });
+    setFormErrors({});
+    setFormModalState("pending");
+  };
 
   const fetchUnits = async () => {
     try {
       setLoading(true);
-      const response = await getUnits();
-      const data = Array.isArray(response) ? response : response.data || [];
-      setUnits(data);
+      const data = await getUnits();
+      setUnits(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch units:", error);
+      setUnits([]);
     } finally {
       setLoading(false);
     }
@@ -63,19 +86,20 @@ export default function Units() {
   }, []);
 
   const handleDeleteClick = (id: string) => {
-    setSelectedUnitId(id);
+    setDeletingUnitId(id);
     setModalState("pending");
     setDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedUnitId) return;
+    if (!deletingUnitId) return;
 
     setConfirmLoading(true);
+
     try {
-      await deleteUnit(selectedUnitId);
+      await deleteUnit(deletingUnitId);
       setModalState("success");
-      fetchUnits();
+      await fetchUnits();
     } catch (error) {
       console.error("Failed to delete unit:", error);
       setModalState("error");
@@ -86,53 +110,98 @@ export default function Units() {
 
   const handleCloseDeleteModal = () => {
     setDeleteModalOpen(false);
-    setSelectedUnitId(null);
+    setDeletingUnitId(null);
     setModalState("pending");
   };
 
-  // Form handlers
   const handleOpenCreateModal = () => {
+    resetForm();
     setFormMode("create");
-    setFormData({ name: "", shortName: "", isActive: true });
-    setFormErrors({});
+    setFormModalState("pending");
     setFormModalOpen(true);
   };
 
   const handleOpenEditModal = async (id: string) => {
+    setEditingUnitId(id);
     setFormMode("edit");
+    setFormModalState("pending");
+    setFormErrors({});
     setFormLoading(true);
+
     try {
       const unit = await getUnitById(id);
+
       setFormData({
-        name: unit.name,
-        shortName: unit.shortName,
+        name: unit.name ?? "",
+        shortName: unit.shortName ?? "",
         isActive: unit.isActive,
       });
-      setFormErrors({});
+
       setFormModalOpen(true);
     } catch (error) {
       console.error("Failed to fetch unit:", error);
+      setEditingUnitId(null);
+      setFormMode(null);
     } finally {
       setFormLoading(false);
     }
   };
 
   const handleCloseFormModal = () => {
+    if (formLoading) return;
+
     setFormModalOpen(false);
-    setFormMode(null);
-    setFormData({ name: "", shortName: "", isActive: true });
-    setFormErrors({});
+    resetForm();
+  };
+
+  const handleNameChange = (name: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+    }));
+
+    if (formErrors.name) {
+      setFormErrors((prev) => ({
+        ...prev,
+        name: undefined,
+      }));
+    }
+  };
+
+  const handleShortNameChange = (shortName: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      shortName,
+    }));
+
+    if (formErrors.shortName) {
+      setFormErrors((prev) => ({
+        ...prev,
+        shortName: undefined,
+      }));
+    }
+  };
+
+  const handleActiveChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      isActive: checked,
+    }));
   };
 
   const validateForm = (): boolean => {
-    const errors: Partial<CreateUnitPayload> = {};
+    const errors: UnitFormErrors = {};
+
     if (!formData.name.trim()) {
       errors.name = "نام واحد الزامی است";
     }
+
     if (!formData.shortName.trim()) {
       errors.shortName = "نام کوتاه واحد الزامی است";
     }
+
     setFormErrors(errors);
+
     return Object.keys(errors).length === 0;
   };
 
@@ -140,14 +209,28 @@ export default function Units() {
     if (!validateForm()) return;
 
     setFormLoading(true);
+    setFormModalState("pending");
+
     try {
       if (formMode === "create") {
         await createUnit(formData);
-      } else if (formMode === "edit" && selectedUnitId) {
-        await updateUnit(selectedUnitId, formData as UpdateUnitPayload);
       }
+
+      if (formMode === "edit") {
+        if (!editingUnitId) {
+          throw new Error("Editing unit id is missing.");
+        }
+
+        await updateUnit(editingUnitId, formData as UpdateUnitPayload);
+      }
+
       setFormModalState("success");
-      fetchUnits();
+      await fetchUnits();
+
+      window.setTimeout(() => {
+        setFormModalOpen(false);
+        resetForm();
+      }, 700);
     } catch (error) {
       console.error("Failed to save unit:", error);
       setFormModalState("error");
@@ -286,16 +369,20 @@ export default function Units() {
           leaveTo="opacity-0 scale-95"
           className="relative w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6 shadow-xl transition-all dark:bg-dark-700"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-800 dark:text-dark-50">
               {formMode === "create" && "افزودن واحد جدید"}
               {formMode === "edit" && "ویرایش واحد"}
             </h3>
+
             <button
+              type="button"
               onClick={handleCloseFormModal}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              disabled={formLoading}
+              aria-disabled={formLoading}
+              className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-gray-300"
             >
-              <XMarkIcon className="w-6 h-6" />
+              <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
 
@@ -309,7 +396,7 @@ export default function Units() {
             <Input
               label="نام واحد"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => handleNameChange(e.target.value)}
               error={formErrors.name}
               disabled={formLoading}
             />
@@ -317,48 +404,64 @@ export default function Units() {
             <Input
               label="نام کوتاه"
               value={formData.shortName}
-              onChange={(e) => setFormData({ ...formData, shortName: e.target.value })}
+              onChange={(e) => handleShortNameChange(e.target.value)}
               error={formErrors.shortName}
               disabled={formLoading}
             />
 
             <div className="flex items-center gap-3">
               <Switch
-                checked={formData.isActive}
-                onChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                checked={formData.isActive ?? true}
+                onChange={handleActiveChange}
                 disabled={formLoading}
               />
-              <span className="text-sm text-gray-700 dark:text-dark-300">فعال</span>
+              <span className="text-sm text-gray-700 dark:text-dark-300">
+                فعال
+              </span>
             </div>
 
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="mt-6 flex justify-end gap-2">
               <Button
+                type="button"
                 variant="outlined"
                 onClick={handleCloseFormModal}
                 disabled={formLoading}
+                aria-disabled={formLoading}
               >
                 لغو
               </Button>
+
               <Button
                 color="primary"
                 type="submit"
-                loading={formLoading}
+                disabled={formLoading}
+                aria-busy={formLoading}
               >
-                ذخیره
+                <span className="inline-flex items-center gap-2">
+                  {formLoading && (
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                    />
+                  )}
+                  <span>{formLoading ? "در حال ذخیره..." : "ذخیره"}</span>
+                </span>
               </Button>
             </div>
           </form>
 
-          {/* Success/Error State */}
-          {formModalState !== "pending" && formModalState !== "error" && (
+          {formModalState !== "pending" && (
             <div className="mt-4">
               {formModalState === "success" && (
                 <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                   <p className="text-sm text-green-800 dark:text-green-200">
-                    {formMode === "create" ? "واحد با موفقیت ایجاد شد!" : "واحد با موفقیت به‌روزرسانی شد!"}
+                    {formMode === "create"
+                      ? "واحد با موفقیت ایجاد شد!"
+                      : "واحد با موفقیت به‌روزرسانی شد!"}
                   </p>
                 </div>
               )}
+
               {formModalState === "error" && (
                 <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
                   <p className="text-sm text-red-800 dark:text-red-200">
