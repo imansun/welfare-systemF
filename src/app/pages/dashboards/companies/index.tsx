@@ -60,7 +60,9 @@ import { Input } from "@/components/ui/Form/Input";
 import { Switch } from "@/components/ui/Form/Switch";
 import { Upload } from "@/components/ui/Form/Upload";
 import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui/Table";
+import { Spinner } from "@/components/ui/Spinner";
 import { useDisclosure } from "@/hooks";
+import { toast } from "sonner";
 
 // ----------------------------------------------------------------------
 
@@ -600,9 +602,11 @@ export default function Companies() {
 
         debugLog("createCompany payload:", payload);
 
-        const createResponse = await createCompany(payload);
+        await createCompany(payload);
 
-        debugLog("createCompany response:", createResponse);
+        debugLog("createCompany response: success");
+
+        toast.success("شرکت با موفقیت ایجاد شد!");
       } else if (formMode === "edit" && selectedCompanyId) {
         const payload: UpdateCompanyPayload = {
           name: formData.name.trim(),
@@ -613,14 +617,17 @@ export default function Companies() {
         debugLog("updateCompany id:", selectedCompanyId);
         debugLog("updateCompany payload:", payload);
 
-        const updateResponse = await updateCompany(selectedCompanyId, payload);
+        await updateCompany(selectedCompanyId, payload);
 
-        debugLog("updateCompany response:", updateResponse);
+        debugLog("updateCompany response: success");
+
+        toast.success("شرکت با موفقیت به‌روزرسانی شد!");
       } else {
         debugLog("handleSubmitForm skipped because mode/id is invalid:", {
           formMode,
           selectedCompanyId,
         });
+        return;
       }
 
       setFormModalState("success");
@@ -637,6 +644,7 @@ export default function Companies() {
 
       setFormModalState("error");
       setFormErrorMessage("ذخیره اطلاعات شرکت با خطا مواجه شد.");
+      toast.error("ذخیره اطلاعات شرکت با خطا مواجه شد.");
     } finally {
       setFormLoading(false);
       debugLog("handleSubmitForm finished");
@@ -1262,6 +1270,9 @@ export default function Companies() {
                                 isGlow={hover && !active}
                                 disabled={formLoading}
                               >
+                                {formLoading && (
+                                  <Spinner className="mr-2 size-4 border-2" />
+                                )}
                                 {formLoading
                                   ? "در حال ذخیره..."
                                   : formMode === "create"
