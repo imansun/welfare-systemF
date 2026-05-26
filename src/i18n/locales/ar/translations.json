@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "dashboards": {
+      "dashboards": "لوحات التحكم",
+      "home": "الرئيسية",
+      "companies": "الشركات",
+      "units": "الوحدات"
+    },
+    "settings": {
+      "settings": "الإعدادات",
+      "general": "عام",
+      "appearance": "المظهر"
+    }
+  }
+}
