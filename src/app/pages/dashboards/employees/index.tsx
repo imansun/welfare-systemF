@@ -1,6 +1,6 @@
 // src/app/pages/dashboards/employees/index.tsx
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/components/shared/Page";
 import { Button } from "@/components/ui/Button";
@@ -27,8 +27,21 @@ import {
   DialogPanel,
   Transition,
   TransitionChild,
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Button as HeadlessButton,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  QuestionMarkCircleIcon,
+  ArrowUpIcon,
+  CalendarIcon,
+  DocumentArrowUpIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  LightBulbIcon,
+} from "@heroicons/react/24/outline";
 
 type ModalMode = "create" | "edit" | null;
 type ModalState = "pending" | "success" | "error";
@@ -347,6 +360,378 @@ export default function Employees() {
           </h2>
 
           <div className="flex flex-wrap items-center gap-2">
+            <Popover className="relative">
+              <PopoverButton as={Fragment}>
+                {({ hover, active }) => (
+                  <Button color="info" isGlow={hover && !active} isIcon>
+                    <QuestionMarkCircleIcon className="size-5" />
+                  </Button>
+                )}
+              </PopoverButton>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out"
+                enterFrom="opacity-0 translate-y-2"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-2"
+              >
+                <PopoverPanel
+                  anchor={{ to: "bottom end", gap: 8 }}
+                  className="z-100 w-[28rem] max-w-[90vw] rounded-md border border-gray-300 bg-white px-4 py-3 shadow-lg shadow-gray-200/50 outline-hidden ring-primary-500/50 focus-visible:outline-hidden focus-visible:ring-3 dark:border-dark-500 dark:bg-dark-750 dark:shadow-none"
+                >
+                  <h3 className="text-base font-medium tracking-wide text-gray-800 dark:text-dark-100">
+                    راهنمای وارد کردن کارمندان از فایل اکسل
+                  </h3>
+
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        هدف
+                      </h4>
+                      <p className="mt-1 text-xs text-gray-600 dark:text-dark-300">
+                        این امکان به شما اجازه می‌دهد تا اطلاعات کارمندان را به
+                        صورت دسته‌ای و از طریق یک فایل اکسل وارد سیستم کنید. با
+                        این روش می‌توانید در زمان خود صرفه‌جویی کرده و از ورود
+                        تکراری اطلاعات جلوگیری کنید.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        فرمت فایل
+                      </h4>
+                      <ul className="mt-1 list-inside list-disc text-xs text-gray-600 dark:text-dark-300">
+                        <li>نوع فایل: اکسل با پسوند .xlsx یا .xls</li>
+                        <li>برگه (Sheet): فقط اولین برگه فایل خوانده می‌شود</li>
+                        <li>سطر اول: باید شامل نام ستون‌ها (هدر) باشد</li>
+                        <li>
+                          نام ستون‌ها: حساس به حروف بزرگ/کوچک نیستند و فاصله،
+                          زیرخط (_) و خط تیره (-) در آن‌ها نادیده گرفته می‌شود
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        ستون‌های مورد نیاز
+                      </h4>
+                      <div className="mt-1 overflow-x-auto">
+                        <table className="min-w-full text-xs text-gray-600 dark:text-dark-300">
+                          <thead className="bg-gray-50 dark:bg-dark-700">
+                            <tr>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                نام ستون (انگلیسی)
+                              </th>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                معادل فارسی
+                              </th>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                الزامی/اختیاری
+                              </th>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                توضیحات
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                personnelCode
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                کد پرسنلی
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                الزامی
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                کد یکتای هر کارمند
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                fullName
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                نام و نام خانوادگی
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                الزامی
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                نام کامل کارمند
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                isActive
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                فعال، وضعیت
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                اختیاری
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                پیش‌فرض: true (فعال)
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                companyCode
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                کد شرکت
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                اختیاری
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                کد شرکت مربوطه
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                companyName
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                نام شرکت
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                اختیاری
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                نام شرکت مربوطه
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        مقادیر مجاز برای ستون isActive
+                      </h4>
+                      <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded bg-green-50 p-2 dark:bg-green-900/20">
+                          <p className="font-medium text-green-800 dark:text-green-200">
+                            مقادیر فعال (true):
+                          </p>
+                          <p className="mt-1 text-gray-600 dark:text-dark-300">
+                            انگلیسی: true, 1, yes, y, active
+                            <br />
+                            فارسی: فعال, بلی, بله
+                          </p>
+                        </div>
+                        <div className="rounded bg-red-50 p-2 dark:bg-red-900/20">
+                          <p className="font-medium text-red-800 dark:text-red-200">
+                            مقادیر غیرفعال (false):
+                          </p>
+                          <p className="mt-1 text-gray-600 dark:text-dark-300">
+                            انگلیسی: false, 0, no, n, inactive
+                            <br />
+                            فارسی: غیرفعال, خیر, نه
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded bg-amber-50 p-2 dark:bg-amber-900/20">
+                      <p className="flex items-center gap-1 text-xs font-medium text-amber-800 dark:text-amber-200">
+                        <ExclamationTriangleIcon className="size-4" />
+                        توجه: استفاده از مقادیر دیگر باعث ایجاد خطا می‌شود.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        رفتار سیستم در شرایط مختلف
+                      </h4>
+                      <div className="mt-1 space-y-2 text-xs text-gray-600 dark:text-dark-300">
+                        <div>
+                          <p className="font-medium text-gray-700 dark:text-dark-200">
+                            ۱. شرکت‌ها (Companies)
+                          </p>
+                          <ul className="mt-1 list-inside list-disc space-y-1">
+                            <li>
+                              اگر کد شرکت ارائه شده باشد، سیستم ابتدا شرکت را
+                              بر اساس کد جستجو می‌کند
+                            </li>
+                            <li>
+                              اگر شرکت با کد مورد نظر یافت نشد، سیستم بر اساس
+                              نام شرکت جستجو می‌کند
+                            </li>
+                            <li>
+                              اگر هیچ شرکتی یافت نشد، یک شرکت جدید به صورت
+                              خودکار ایجاد می‌شود
+                            </li>
+                            <li>
+                              اگر neither کد شرکت و neither نام شرکت ارائه نشده
+                              باشد، فیلد شرکت برای آن کارمند خالی (null)
+                              می‌ماند
+                            </li>
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-700 dark:text-dark-200">
+                            ۲. کارمندان جدید در مقابل به‌روزرسانی
+                          </p>
+                          <ul className="mt-1 list-inside list-disc space-y-1">
+                            <li>
+                              اگر کد پرسنلی در فایل تکراری باشد → آن سطر نادیده
+                              گرفته می‌شود و خطا ثبت می‌گردد
+                            </li>
+                            <li>
+                              اگر کد پرسنلی قبلاً در پایگاه داده وجود داشته
+                              باشد → رکورد به‌روزرسانی می‌شود
+                            </li>
+                            <li>
+                              اگر کد پرسنلی جدید باشد → یک رکورد کارمند جدید
+                              ایجاد می‌شود
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-gray-700 dark:text-dark-200">
+                        خروجی عملیات وارد کردن
+                      </h4>
+                      <div className="mt-1 overflow-x-auto">
+                        <table className="min-w-full text-xs text-gray-600 dark:text-dark-300">
+                          <thead className="bg-gray-50 dark:bg-dark-700">
+                            <tr>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                فیلد
+                              </th>
+                              <th className="border px-2 py-1 text-right font-medium dark:border-dark-500">
+                                توضیحات
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                totalRows
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                تعداد کل سطرها processed شده
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                imported
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                تعداد کارمندان جدید ایجاد شده
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                updated
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                تعداد کارمندان موجود که به‌روزرسانی شدند
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                skipped
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                تعداد سطرهایی که به دلیل خطا نادیده گرفته شدند
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                errors
+                              </td>
+                              <td className="border px-2 py-1 dark:border-dark-500">
+                                آرایه‌ای از پیام‌های خطا
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="rounded bg-blue-50 p-2 dark:bg-blue-900/20">
+                        <p className="flex items-center gap-1 text-xs font-medium text-blue-800 dark:text-blue-200">
+                          <CheckCircleIcon className="size-4" />
+                          نکات کلیدی:
+                        </p>
+                        <ul className="mt-1 list-inside list-disc space-y-1 text-xs text-gray-600 dark:text-dark-300">
+                          <li>
+                            حداقل یکی از ستون‌های personnelCode یا fullName باید
+                            پر باشد
+                          </li>
+                          <li>کد پرسنلی تکراری در داخل یک فایل مجاز نیست</li>
+                          <li>
+                            نام ستون‌ها حساس به حروف بزرگ/کوچک نیست
+                          </li>
+                          <li>
+                            فاصله، زیرخط و خط تیره در نام ستون‌ها نادیده گرفته
+                            می‌شود
+                          </li>
+                          <li>
+                            اگر شرکت یافت نشود، به صورت خودکار ایجاد می‌شود
+                          </li>
+                          <li>سطر هدر (سطر اول) جزو داده‌ها محسوب نمی‌شود</li>
+                        </ul>
+                      </div>
+
+                      <div className="rounded bg-red-50 p-2 dark:bg-red-900/20">
+                        <p className="flex items-center gap-1 text-xs font-medium text-red-800 dark:text-red-200">
+                          <ExclamationTriangleIcon className="size-4" />
+                          خطاهای رایج:
+                        </p>
+                        <ul className="mt-1 list-inside list-disc space-y-1 text-xs text-gray-600 dark:text-dark-300">
+                          <li>خالی بودن کد پرسنلی یا نام کامل</li>
+                          <li>تکراری بودن کد پرسنلی در فایل</li>
+                          <li>مقدار نامعتبر برای ستون وضعیت (isActive)</li>
+                        </ul>
+                      </div>
+
+                      <div className="rounded bg-amber-50 p-2 dark:bg-amber-900/20">
+                        <p className="flex items-center gap-1 text-xs font-medium text-amber-800 dark:text-amber-200">
+                          <LightBulbIcon className="size-4" />
+                          پیشنهاد:
+                        </p>
+                        <p className="mt-1 text-xs text-gray-600 dark:text-dark-300">
+                          قبل از ارسال فایل نهایی، یک فایل تستی با چند سطر آماده
+                          کنید و نتیجه را بررسی نمایید.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-3 dark:border-dark-500">
+                    <p className="flex items-center gap-2 text-xs text-gray-500 dark:text-dark-400">
+                      <CalendarIcon className="size-4" />
+                      <span>آخرین به‌روزرسانی: ۱۴۰۳</span>
+                    </p>
+                    <HeadlessButton as={Fragment}>
+                      {({ hover, active }) => (
+                        <Button
+                          isIcon
+                          className="h-7 w-7 rounded-full"
+                          color={hover && !active ? "primary" : undefined}
+                          isGlow={hover && !active}
+                        >
+                          <ArrowUpIcon className="size-4 rotate-45" />
+                        </Button>
+                      )}
+                    </HeadlessButton>
+                  </div>
+                </PopoverPanel>
+              </Transition>
+            </Popover>
+
             <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-dark-500 dark:bg-dark-800 dark:text-dark-100 dark:hover:bg-dark-700">
               <input
                 type="file"
@@ -358,9 +743,13 @@ export default function Employees() {
               {importLoading ? "در حال ایمپورت..." : "ایمپورت اکسل"}
             </label>
 
-            <Button color="primary" onClick={handleOpenCreateModal}>
-              افزودن کارمند جدید
-            </Button>
+            <HeadlessButton as={Fragment}>
+              {({ hover, active }) => (
+                <Button color="primary" isGlow={hover && !active} onClick={handleOpenCreateModal}>
+                  افزودن کارمند جدید
+                </Button>
+              )}
+            </HeadlessButton>
           </div>
         </div>
 
@@ -449,23 +838,33 @@ export default function Employees() {
                     </Td>
                     <Td>
                       <div className="flex gap-2">
-                        <Button
-                          variant="flat"
-                          color="primary"
-                          className="h-8 px-3 text-sm"
-                          onClick={() => handleOpenEditModal(employee.id)}
-                        >
-                          ویرایش
-                        </Button>
+                        <HeadlessButton as={Fragment}>
+                          {({ hover, active }) => (
+                            <Button
+                              variant="flat"
+                              color="primary"
+                              isGlow={hover && !active}
+                              className="h-8 px-3 text-sm"
+                              onClick={() => handleOpenEditModal(employee.id)}
+                            >
+                              ویرایش
+                            </Button>
+                          )}
+                        </HeadlessButton>
 
-                        <Button
-                          variant="flat"
-                          color="error"
-                          className="h-8 px-3 text-sm"
-                          onClick={() => handleDeleteClick(employee.id)}
-                        >
-                          حذف
-                        </Button>
+                        <HeadlessButton as={Fragment}>
+                          {({ hover, active }) => (
+                            <Button
+                              variant="flat"
+                              color="error"
+                              isGlow={hover && !active}
+                              className="h-8 px-3 text-sm"
+                              onClick={() => handleDeleteClick(employee.id)}
+                            >
+                              حذف
+                            </Button>
+                          )}
+                        </HeadlessButton>
                       </div>
                     </Td>
                   </Tr>
@@ -630,32 +1029,42 @@ export default function Employees() {
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outlined"
-                onClick={handleCloseFormModal}
-                disabled={formLoading}
-                aria-disabled={formLoading}
-              >
-                لغو
-              </Button>
+              <HeadlessButton as={Fragment}>
+                {({ hover, active }) => (
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    isGlow={hover && !active}
+                    onClick={handleCloseFormModal}
+                    disabled={formLoading}
+                    aria-disabled={formLoading}
+                  >
+                    لغو
+                  </Button>
+                )}
+              </HeadlessButton>
 
-              <Button
-                color="primary"
-                type="submit"
-                disabled={formLoading}
-                aria-busy={formLoading}
-              >
-                <span className="inline-flex items-center gap-2">
-                  {formLoading && (
-                    <span
-                      aria-hidden="true"
-                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-                    />
-                  )}
-                  <span>{formLoading ? "در حال ذخیره..." : "ذخیره"}</span>
-                </span>
-              </Button>
+              <HeadlessButton as={Fragment}>
+                {({ hover, active }) => (
+                  <Button
+                    color="primary"
+                    type="submit"
+                    isGlow={hover && !active}
+                    disabled={formLoading}
+                    aria-busy={formLoading}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      {formLoading && (
+                        <span
+                          aria-hidden="true"
+                          className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                        />
+                      )}
+                      <span>{formLoading ? "در حال ذخیره..." : "ذخیره"}</span>
+                    </span>
+                  </Button>
+                )}
+              </HeadlessButton>
             </div>
           </form>
 
