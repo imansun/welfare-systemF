@@ -197,28 +197,34 @@ export default function Periods() {
   };
 
   const fetchPeriods = async () => {
+    console.log("📋 [PERIODS] Fetching periods list...");
     try {
       setLoading(true);
       const data = await getPeriods();
+      console.log("✅ [PERIODS] Periods fetched successfully:", data);
       setPeriods(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Failed to fetch periods:", error);
+      console.error("❌ [PERIODS] Failed to fetch periods:", error);
       setPeriods([]);
     } finally {
       setLoading(false);
+      console.log("🏁 [PERIODS] Fetch periods completed, loading set to false");
     }
   };
 
   const fetchPackageItems = async (periodId: string) => {
+    console.log(`📦 [PACKAGE ITEMS] Fetching package items for period ${periodId}...`);
     try {
       setPackageItemsLoading(true);
       const data = await getPeriodPackageItems(periodId);
+      console.log("✅ [PACKAGE ITEMS] Package items fetched successfully:", data);
       setPackageItems(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Failed to fetch period package items:", error);
+      console.error("❌ [PACKAGE ITEMS] Failed to fetch package items:", error);
       setPackageItems([]);
     } finally {
       setPackageItemsLoading(false);
+      console.log("🏁 [PACKAGE ITEMS] Fetch completed, loading set to false");
     }
   };
 
@@ -227,13 +233,16 @@ export default function Periods() {
   }, []);
 
   const handleOpenCreateModal = () => {
+    console.log("➕ [CREATE PERIOD] Opening create modal...");
     resetPeriodForm();
     setFormMode("create");
     setFormModalState("pending");
     setFormModalOpen(true);
+    console.log("✅ [CREATE PERIOD] Create modal opened successfully");
   };
 
   const handleOpenEditModal = async (id: string) => {
+    console.log(`✏️ [EDIT PERIOD] Opening edit modal for period ID: ${id}...`);
     setEditingPeriodId(id);
     setFormMode("edit");
     setFormModalState("pending");
@@ -241,7 +250,9 @@ export default function Periods() {
     setFormLoading(true);
 
     try {
+      console.log(`📡 [EDIT PERIOD] Fetching period details for ID: ${id}...`);
       const period = await getPeriodById(id);
+      console.log("✅ [EDIT PERIOD] Period fetched successfully:", period);
 
       setFormData({
         code: period.code ?? "",
@@ -253,12 +264,14 @@ export default function Periods() {
       });
 
       setFormModalOpen(true);
+      console.log("✅ [EDIT PERIOD] Edit modal opened with form data populated");
     } catch (error) {
-      console.error("Failed to fetch period:", error);
+      console.error("❌ [EDIT PERIOD] Failed to fetch period:", error);
       setEditingPeriodId(null);
       setFormMode(null);
     } finally {
       setFormLoading(false);
+      console.log("🏁 [EDIT PERIOD] Edit modal operation completed");
     }
   };
 
@@ -270,9 +283,11 @@ export default function Periods() {
   };
 
   const handleDeleteClick = (id: string) => {
+    console.log(`🗑️ [DELETE PERIOD] Delete clicked for period ID: ${id}`);
     setDeletingPeriodId(id);
     setDeleteModalState("pending");
     setDeleteModalOpen(true);
+    console.log("✅ [DELETE PERIOD] Delete confirmation modal opened");
   };
 
   const handleCloseDeleteModal = () => {
@@ -284,43 +299,61 @@ export default function Periods() {
   const handleDeleteConfirm = async () => {
     if (!deletingPeriodId) return;
 
+    console.log(`🗑️ [DELETE PERIOD] Confirming delete for period ID: ${deletingPeriodId}`);
     setConfirmLoading(true);
 
     try {
+      console.log(`📡 [DELETE PERIOD] Calling deletePeriod API for ID: ${deletingPeriodId}...`);
       await deletePeriod(deletingPeriodId);
+      console.log("✅ [DELETE PERIOD] Period deleted successfully from API");
       setDeleteModalState("success");
+      console.log("🔄 [DELETE PERIOD] Refreshing periods list...");
       await fetchPeriods();
+      console.log("✅ [DELETE PERIOD] Periods list refreshed after deletion");
     } catch (error) {
-      console.error("Failed to delete period:", error);
+      console.error("❌ [DELETE PERIOD] Failed to delete period:", error);
       setDeleteModalState("error");
     } finally {
       setConfirmLoading(false);
+      console.log("🏁 [DELETE PERIOD] Delete operation completed");
     }
   };
 
   const handleArchivePeriod = async (id: string) => {
+    console.log(`📦 [ARCHIVE PERIOD] Archiving period ID: ${id}...`);
     setPeriodActionLoadingId(id);
 
     try {
+      console.log(`📡 [ARCHIVE PERIOD] Calling archivePeriod API for ID: ${id}...`);
       await archivePeriod(id);
+      console.log("✅ [ARCHIVE PERIOD] Period archived successfully");
+      console.log("🔄 [ARCHIVE PERIOD] Refreshing periods list...");
       await fetchPeriods();
+      console.log("✅ [ARCHIVE PERIOD] Periods list refreshed after archive");
     } catch (error) {
-      console.error("Failed to archive period:", error);
+      console.error("❌ [ARCHIVE PERIOD] Failed to archive period:", error);
     } finally {
       setPeriodActionLoadingId(null);
+      console.log("🏁 [ARCHIVE PERIOD] Archive operation completed");
     }
   };
 
   const handleCancelPeriod = async (id: string) => {
+    console.log(`🚫 [CANCEL PERIOD] Cancelling period ID: ${id}...`);
     setPeriodActionLoadingId(id);
 
     try {
+      console.log(`📡 [CANCEL PERIOD] Calling cancelPeriod API for ID: ${id}...`);
       await cancelPeriod(id);
+      console.log("✅ [CANCEL PERIOD] Period cancelled successfully");
+      console.log("🔄 [CANCEL PERIOD] Refreshing periods list...");
       await fetchPeriods();
+      console.log("✅ [CANCEL PERIOD] Periods list refreshed after cancel");
     } catch (error) {
-      console.error("Failed to cancel period:", error);
+      console.error("❌ [CANCEL PERIOD] Failed to cancel period:", error);
     } finally {
       setPeriodActionLoadingId(null);
+      console.log("🏁 [CANCEL PERIOD] Cancel operation completed");
     }
   };
 
@@ -374,8 +407,16 @@ export default function Periods() {
   };
 
   const handleSubmitPeriodForm = async () => {
-    if (!validatePeriodForm()) return;
+    console.log("💾 [SUBMIT PERIOD FORM] Starting form submission...");
+    console.log(`📝 [SUBMIT PERIOD FORM] Form mode: ${formMode}`);
+    console.log("📋 [SUBMIT PERIOD FORM] Form data:", formData);
 
+    if (!validatePeriodForm()) {
+      console.error("❌ [SUBMIT PERIOD FORM] Validation failed:", formErrors);
+      return;
+    }
+
+    console.log("✅ [SUBMIT PERIOD FORM] Validation passed");
     setFormLoading(true);
     setFormModalState("pending");
 
@@ -388,40 +429,52 @@ export default function Periods() {
         description: formData.description?.trim() || undefined,
         createdById: formData.createdById.trim(),
       };
+      console.log("📦 [SUBMIT PERIOD FORM] Prepared payload:", payload);
 
       if (formMode === "create") {
-        await createPeriod(payload);
+        console.log(`📡 [SUBMIT PERIOD FORM] Calling createPeriod API...`);
+        const result = await createPeriod(payload);
+        console.log("✅ [SUBMIT PERIOD FORM] Period created successfully:", result);
       }
 
       if (formMode === "edit") {
         if (!editingPeriodId) {
           throw new Error("Editing period id is missing.");
         }
-
-        await updatePeriod(editingPeriodId, payload as UpdatePeriodPayload);
+        console.log(`📡 [SUBMIT PERIOD FORM] Calling updatePeriod API for ID: ${editingPeriodId}...`);
+        const result = await updatePeriod(editingPeriodId, payload as UpdatePeriodPayload);
+        console.log("✅ [SUBMIT PERIOD FORM] Period updated successfully:", result);
       }
 
       setFormModalState("success");
+      console.log("✅ [SUBMIT PERIOD FORM] Form state set to success");
+      console.log("🔄 [SUBMIT PERIOD FORM] Refreshing periods list...");
       await fetchPeriods();
+      console.log("✅ [SUBMIT PERIOD FORM] Periods list refreshed");
 
       window.setTimeout(() => {
+        console.log("⏱️ [SUBMIT PERIOD FORM] Timeout completed, closing modal...");
         setFormModalOpen(false);
         resetPeriodForm();
       }, 700);
     } catch (error) {
-      console.error("Failed to save period:", error);
+      console.error("❌ [SUBMIT PERIOD FORM] Failed to save period:", error);
       setFormModalState("error");
     } finally {
       setFormLoading(false);
+      console.log("🏁 [SUBMIT PERIOD FORM] Form submission completed");
     }
   };
 
   const handleOpenPackageItemsModal = async (period: DistributionPeriod) => {
+    console.log(`📦 [PACKAGE ITEMS MODAL] Opening package items modal for period:`, period);
     setSelectedPeriod(period);
     resetPackageItemForm();
     setPackageItems([]);
     setPackageItemsModalOpen(true);
+    console.log("🔄 [PACKAGE ITEMS MODAL] Fetching package items...");
     await fetchPackageItems(period.id);
+    console.log("✅ [PACKAGE ITEMS MODAL] Package items modal opened successfully");
   };
 
   const handleClosePackageItemsModal = () => {
@@ -434,11 +487,14 @@ export default function Periods() {
   };
 
   const handleOpenCreatePackageItemForm = () => {
+    console.log("➕ [CREATE PACKAGE ITEM] Opening create package item form...");
     resetPackageItemForm();
     setPackageItemFormMode("create");
+    console.log("✅ [CREATE PACKAGE ITEM] Create package item form opened");
   };
 
   const handleOpenEditPackageItemForm = (packageItem: PeriodPackageItem) => {
+    console.log(`✏️ [EDIT PACKAGE ITEM] Opening edit form for package item ID: ${packageItem.id}`, packageItem);
     setPackageItemFormMode("edit");
     setEditingPackageItemId(packageItem.id);
     setPackageItemFormState("pending");
@@ -448,6 +504,7 @@ export default function Periods() {
       quantity: packageItem.quantity ?? "",
       note: packageItem.note ?? "",
     });
+    console.log("✅ [EDIT PACKAGE ITEM] Edit form populated with data");
   };
 
   const handleCancelPackageItemForm = () => {
@@ -490,9 +547,22 @@ export default function Periods() {
   };
 
   const handleSubmitPackageItemForm = async () => {
-    if (!selectedPeriod) return;
-    if (!validatePackageItemForm()) return;
+    if (!selectedPeriod) {
+      console.error("❌ [SUBMIT PACKAGE ITEM FORM] No period selected");
+      return;
+    }
+    
+    console.log("💾 [SUBMIT PACKAGE ITEM FORM] Starting form submission...");
+    console.log(`📝 [SUBMIT PACKAGE ITEM FORM] Form mode: ${packageItemFormMode}`);
+    console.log(`📦 [SUBMIT PACKAGE ITEM FORM] Selected period ID: ${selectedPeriod.id}`);
+    console.log("📋 [SUBMIT PACKAGE ITEM FORM] Form data:", packageItemFormData);
 
+    if (!validatePackageItemForm()) {
+      console.error("❌ [SUBMIT PACKAGE ITEM FORM] Validation failed:", packageItemFormErrors);
+      return;
+    }
+
+    console.log("✅ [SUBMIT PACKAGE ITEM FORM] Validation passed");
     setPackageItemFormLoading(true);
     setPackageItemFormState("pending");
 
@@ -502,48 +572,68 @@ export default function Periods() {
         quantity: packageItemFormData.quantity.trim(),
         note: packageItemFormData.note?.trim() || undefined,
       };
+      console.log("📦 [SUBMIT PACKAGE ITEM FORM] Prepared payload:", payload);
 
       if (packageItemFormMode === "create") {
-        await createPeriodPackageItem(selectedPeriod.id, payload);
+        console.log(`📡 [SUBMIT PACKAGE ITEM FORM] Calling createPeriodPackageItem API for period ID: ${selectedPeriod.id}...`);
+        const result = await createPeriodPackageItem(selectedPeriod.id, payload);
+        console.log("✅ [SUBMIT PACKAGE ITEM FORM] Package item created successfully:", result);
       }
 
       if (packageItemFormMode === "edit") {
         if (!editingPackageItemId) {
           throw new Error("Editing package item id is missing.");
         }
-
-        await updatePeriodPackageItem(
+        console.log(`📡 [SUBMIT PACKAGE ITEM FORM] Calling updatePeriodPackageItem API for period ID: ${selectedPeriod.id}, package item ID: ${editingPackageItemId}...`);
+        const result = await updatePeriodPackageItem(
           selectedPeriod.id,
           editingPackageItemId,
           payload as UpdatePeriodPackageItemPayload
         );
+        console.log("✅ [SUBMIT PACKAGE ITEM FORM] Package item updated successfully:", result);
       }
 
       setPackageItemFormState("success");
+      console.log("✅ [SUBMIT PACKAGE ITEM FORM] Form state set to success");
+      console.log("🔄 [SUBMIT PACKAGE ITEM FORM] Refreshing package items list...");
       await fetchPackageItems(selectedPeriod.id);
+      console.log("✅ [SUBMIT PACKAGE ITEM FORM] Package items list refreshed");
       resetPackageItemForm();
     } catch (error) {
-      console.error("Failed to save package item:", error);
+      console.error("❌ [SUBMIT PACKAGE ITEM FORM] Failed to save package item:", error);
       setPackageItemFormState("error");
     } finally {
       setPackageItemFormLoading(false);
+      console.log("🏁 [SUBMIT PACKAGE ITEM FORM] Form submission completed");
     }
   };
 
   const handleDeletePackageItem = async (packageItemId: string) => {
-    if (!selectedPeriod) return;
+    if (!selectedPeriod) {
+      console.error("❌ [DELETE PACKAGE ITEM] No period selected");
+      return;
+    }
+
+    console.log(`🗑️ [DELETE PACKAGE ITEM] Delete clicked for package item ID: ${packageItemId} in period ID: ${selectedPeriod.id}`);
 
     const confirmed = window.confirm(
       "آیا از حذف این آیتم از بسته دوره مطمئن هستید؟"
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      console.log("⛔ [DELETE PACKAGE ITEM] User cancelled delete operation");
+      return;
+    }
 
     try {
+      console.log(`📡 [DELETE PACKAGE ITEM] Calling deletePeriodPackageItem API for period ID: ${selectedPeriod.id}, package item ID: ${packageItemId}...`);
       await deletePeriodPackageItem(selectedPeriod.id, packageItemId);
+      console.log("✅ [DELETE PACKAGE ITEM] Package item deleted successfully");
+      console.log("🔄 [DELETE PACKAGE ITEM] Refreshing package items list...");
       await fetchPackageItems(selectedPeriod.id);
+      console.log("✅ [DELETE PACKAGE ITEM] Package items list refreshed after deletion");
     } catch (error) {
-      console.error("Failed to delete package item:", error);
+      console.error("❌ [DELETE PACKAGE ITEM] Failed to delete package item:", error);
     }
   };
 
