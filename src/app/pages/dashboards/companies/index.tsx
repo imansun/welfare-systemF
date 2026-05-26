@@ -586,7 +586,10 @@ export default function Companies() {
     debugLog("form validation result:", isValid);
     debugLog("formErrors after validation may update async:", formErrors);
 
-    if (!isValid) return;
+    if (!isValid) {
+      debugLog("Form validation failed, returning early");
+      return;
+    }
 
     setFormLoading(true);
     setFormModalState("pending");
@@ -602,9 +605,9 @@ export default function Companies() {
 
         debugLog("createCompany payload:", payload);
 
-        await createCompany(payload);
+        const response = await createCompany(payload);
 
-        debugLog("createCompany response: success");
+        debugLog("createCompany response:", response);
 
         toast.success("شرکت با موفقیت ایجاد شد!");
       } else if (formMode === "edit" && selectedCompanyId) {
@@ -617,9 +620,9 @@ export default function Companies() {
         debugLog("updateCompany id:", selectedCompanyId);
         debugLog("updateCompany payload:", payload);
 
-        await updateCompany(selectedCompanyId, payload);
+        const response = await updateCompany(selectedCompanyId, payload);
 
-        debugLog("updateCompany response: success");
+        debugLog("updateCompany response:", response);
 
         toast.success("شرکت با موفقیت به‌روزرسانی شد!");
       } else {
@@ -1280,6 +1283,7 @@ export default function Companies() {
                                   console.log("🔴 Form Modal State:", formModalState);
                                   console.log("❌ Form Errors:", formErrors);
                                   console.log("========================================");
+                                  // handleSubmitForm will be called by form onSubmit
                                 }}
                               >
                                 {formLoading && (
