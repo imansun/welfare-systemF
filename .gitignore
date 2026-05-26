@@ -4,26 +4,46 @@ node_modules/
 .pnpm-store/
 .npm/
 .yarn/
+bower_components/
 
 # Build outputs
 dist/
 build/
-.out/
-.bundle/
+public/build/
+.next/
+.nuxt/
+.vuepress/dist/
+output/
+_out/
+
+# TypeScript/JavaScript
+*.tsbuildinfo
+*.js.map
+*.jsx.map
+*.ts.map
 
 # Logs
 *.log
-.log
-
-# Environment variables
-.env
-.env.local
-.env.*
-!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # OS generated files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Icon?
+.directory
+.Trashes
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+!.env.example
 
 # IDE specific
 .vscode/
@@ -31,75 +51,23 @@ Thumbs.db
 *.swp
 *.swo
 
-# Python
+# Coverage
+coverage/
+.nyc_output/
+.htmlcov/
+
+# Python related (if applicable)
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
-env/
-venv/
-.venv/
+*.egg-info/
+.eggs/
 pip-log.txt
 pip-delete-this-directory.txt
 .tox/
 .coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.git/
-.mypy_cache/
 .pytest_cache/
-.hypothesis/
-
-# Node.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-node_modules/
-jspm_packages/
-*.tsbuildinfo
-.nyc_output
-coverage/
-lib-cov
-
-# TypeScript
-*.tsbuildinfo
-.next/
-nuxt/dist/
-
-# React
-*.prod.js
-*.min.js
-public/build/
-
-# Compiled JavaScript
-lib/
-es/
-dist/
-tmp/
-out/
-build/
-*.js.map
-*.d.ts.map
-
-# Temporary folders
-tmp/
-temp/
-.DS_Store
-Thumbs.db
-
-# Editor temporary files
-*.swp
-*.swo
-*~
-```
-
-Wait, let me reconsider. The only modified file is a TypeScript React component (`index.tsx`), which is source code, not a build artifact or dependency. Since there are no build artifacts, dependencies, or temporary files in the changes, I should output nothing.
-
-```gitignore
-
+.mypy_cache/
 ```
