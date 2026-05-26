@@ -1,10 +1,36 @@
-// src/app/pages/dashboards/units/index.tsx
-
-import { ChangeEvent, useEffect, useState } from "react";
+// Import Dependencies
+import { Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/components/shared/Page";
-import { Button } from "@/components/ui/Button";
-import { Table, TBody, Td, Th, THead, Tr } from "@/components/ui/Table";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import clsx from "clsx";
+
+// Local Imports
+import { CollapsibleSearch } from "@/components/shared/CollapsibleSearch";
+import {
+  Button,
+  Card,
+  Table,
+  THead,
+  TBody,
+  Th,
+  Tr,
+  Td,
+} from "@/components/ui";
+import { useDisclosure } from "@/hooks";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Form/Input";
 import { Switch } from "@/components/ui/Form/Switch";
@@ -18,14 +44,8 @@ import {
   CreateUnitPayload,
   UpdateUnitPayload,
 } from "@/app/services/endpoints/units";
-import { ConfirmModal } from "@/components/shared/ConfirmModal";
-import {
-  Dialog,
-  DialogPanel,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+
+// ----------------------------------------------------------------------
 
 type ModalMode = "create" | "edit" | null;
 type ModalState = "pending" | "success" | "error";
@@ -33,11 +53,71 @@ type ModalState = "pending" | "success" | "error";
 type UnitFormData = CreateUnitPayload;
 type UnitFormErrors = Partial<Record<keyof CreateUnitPayload, string>>;
 
+const defaultColumns: ColumnDef<UnitItem>[] = [
+  {
+    accessorKey: "name",
+    id: "name",
+    header: "نام",
+  },
+  {
+    accessorKey: "shortName",
+    id: "shortName",
+    header: "نام کوتاه",
+  },
+  {
+    accessorKey: "isActive",
+    id: "isActive",
+    header: "وضعیت",
+    cell: ({ row }) => (
+      <Badge color={row.original.isActive ? "success" : "error"}>
+        {row.original.isActive ? "فعال" : "غیرفعال"}
+      </Badge>
+    ),
+  },
+  {
+    accessorKey: "createdAt",
+    id: "createdAt",
+    header: "تاریخ ایجاد",
+    cell: ({ row }) =>
+      row.original.createdAt
+        ? new Date(row.original.createdAt).toLocaleDateString("fa-IR")
+        : "-",
+  },
+  {
+    id: "actions",
+    header: "عملیات",
+    cell: ({ row }) => (
+      <div className="flex gap-2">
+        <Button
+          variant="flat"
+          color="primary"
+          className="h-8 px-3 text-sm"
+          onClick={() => handleOpenEditModal(row.original.id)}
+        >
+          ویرایش
+        </Button>
+        <Button
+          variant="flat"
+          color="error"
+          className="h-8 px-3 text-sm"
+          onClick={() => handleDeleteClick(row.original.id)}
+        >
+          حذف
+        </Button>
+      </div>
+    ),
+  },
+];
+
+let handleDeleteClick: (id: string) => void;
+let handleOpenEditModal: (id: string) => void;
+
 export default function Units() {
   const { t } = useTranslation();
 
   const [units, setUnits] = useState<UnitItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingUnitId, setDeletingUnitId] = useState<string | null>(null);
@@ -55,6 +135,11 @@ export default function Units() {
   const [formErrors, setFormErrors] = useState<UnitFormErrors>({});
   const [formLoading, setFormLoading] = useState(false);
   const [formModalState, setFormModalState] = useState<ModalState>("pending");
+
+  const [isFormOpen, { open: openForm, close: closeForm }] =
+    useDisclosure(false);
+  const [isDeleteOpen, { open: openDelete, close: closeDelete }] =
+    useDisclosure(false);
 
   const resetForm = () => {
     setFormMode(null);
@@ -81,14 +166,14 @@ export default function Units() {
     }
   };
 
-  useEffect(() => {
+  useMemo(() => {
     fetchUnits();
   }, []);
 
-  const handleDeleteClick = (id: string) => {
+  handleDeleteClick = (id: string) => {
     setDeletingUnitId(id);
     setModalState("pending");
-    setDeleteModalOpen(true);
+    openDelete();
   };
 
   const handleDeleteConfirm = async () => {
@@ -109,7 +194,7 @@ export default function Units() {
   };
 
   const handleCloseDeleteModal = () => {
-    setDeleteModalOpen(false);
+    closeDelete();
     setDeletingUnitId(null);
     setModalState("pending");
   };
@@ -118,7 +203,7 @@ export default function Units() {
     resetForm();
     setFormMode("create");
     setFormModalState("pending");
-    setFormModalOpen(true);
+    openForm();
   };
 
   const handleOpenEditModal = async (id: string) => {
@@ -137,7 +222,7 @@ export default function Units() {
         isActive: unit.isActive,
       });
 
-      setFormModalOpen(true);
+      openForm();
     } catch (error) {
       console.error("Failed to fetch unit:", error);
       setEditingUnitId(null);
@@ -150,7 +235,7 @@ export default function Units() {
   const handleCloseFormModal = () => {
     if (formLoading) return;
 
-    setFormModalOpen(false);
+    closeForm();
     resetForm();
   };
 
@@ -228,7 +313,7 @@ export default function Units() {
       await fetchUnits();
 
       window.setTimeout(() => {
-        setFormModalOpen(false);
+        closeForm();
         resetForm();
       }, 700);
     } catch (error) {
@@ -239,248 +324,325 @@ export default function Units() {
     }
   };
 
+  const columns = useMemo<ColumnDef<UnitItem>[]>(
+    () => [...defaultColumns],
+    [],
+  );
+
+  const filteredData = useMemo(() => {
+    if (!globalFilter) return units;
+    return units.filter(
+      (unit) =>
+        unit.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
+        unit.shortName.toLowerCase().includes(globalFilter.toLowerCase()),
+    );
+  }, [units, globalFilter]);
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <Page title="Units">
       <div className="transition-content w-full px-(--margin-x) pt-5 lg:pt-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
+          <h2 className="dark:text-dark-100 truncate text-base font-medium tracking-wide text-gray-800">
             واحدها
           </h2>
-
-          <Button color="primary" onClick={handleOpenCreateModal}>
-            افزودن واحد جدید
-          </Button>
+          <div className="flex items-center gap-2">
+            <CollapsibleSearch
+              placeholder="اینجا جستجو کنید..."
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+            <Button color="primary" isGlow onClick={handleOpenCreateModal}>
+              افزودن واحد جدید
+            </Button>
+          </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-dark-500 dark:bg-dark-700">
-          <Table>
-            <THead>
-              <Tr>
-                <Th>نام</Th>
-                <Th>نام کوتاه</Th>
-                <Th>وضعیت</Th>
-                <Th>تاریخ ایجاد</Th>
-                <Th>عملیات</Th>
-              </Tr>
-            </THead>
-
-            <TBody>
-              {loading ? (
-                <Tr>
-                  <Td colSpan={5} className="py-4 text-center">
-                    در حال بارگذاری...
-                  </Td>
-                </Tr>
-              ) : units.length === 0 ? (
-                <Tr>
-                  <Td colSpan={5} className="py-4 text-center">
-                    هیچ واحدی یافت نشد
-                  </Td>
-                </Tr>
-              ) : (
-                units.map((unit) => (
-                  <Tr key={unit.id}>
-                    <Td>{unit.name}</Td>
-                    <Td>{unit.shortName}</Td>
-                    <Td>
-                      <Badge color={unit.isActive ? "success" : "error"}>
-                        {unit.isActive ? "فعال" : "غیرفعال"}
-                      </Badge>
-                    </Td>
-                    <Td>
-                      {unit.createdAt
-                        ? new Date(unit.createdAt).toLocaleDateString(
-                            "fa-IR"
-                          )
-                        : "-"}
-                    </Td>
-                    <Td>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="flat"
-                          color="primary"
-                          className="h-8 px-3 text-sm"
-                          onClick={() => handleOpenEditModal(unit.id)}
-                        >
-                          ویرایش
-                        </Button>
-
-                        <Button
-                          variant="flat"
-                          color="error"
-                          className="h-8 px-3 text-sm"
-                          onClick={() => handleDeleteClick(unit.id)}
-                        >
-                          حذف
-                        </Button>
-                      </div>
+        <Card>
+          <div className="min-w-full overflow-x-auto">
+            <Table className="w-full text-left rtl:text-right">
+              <THead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <Tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <Th
+                        key={header.id}
+                        className="dark:bg-dark-800 dark:text-dark-100 bg-gray-200 font-semibold text-gray-800 uppercase first:ltr:rounded-tl-lg last:ltr:rounded-tr-lg first:rtl:rounded-tr-lg last:rtl:rounded-tl-lg"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </Th>
+                    ))}
+                  </Tr>
+                ))}
+              </THead>
+              <TBody>
+                {loading ? (
+                  <Tr>
+                    <Td colSpan={columns.length} className="py-4 text-center">
+                      در حال بارگذاری...
                     </Td>
                   </Tr>
-                ))
-              )}
-            </TBody>
-          </Table>
-        </div>
+                ) : filteredData.length === 0 ? (
+                  <Tr>
+                    <Td colSpan={columns.length} className="py-4 text-center">
+                      هیچ واحدی یافت نشد
+                    </Td>
+                  </Tr>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <Tr
+                      key={row.id}
+                      className={clsx(
+                        "dark:border-b-dark-500 relative border-y border-transparent border-b-gray-200 last:border-none",
+                      )}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <Td key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </Td>
+                      ))}
+                    </Tr>
+                  ))
+                )}
+              </TBody>
+            </Table>
+          </div>
+        </Card>
       </div>
 
-      <ConfirmModal
-        show={deleteModalOpen}
-        onClose={handleCloseDeleteModal}
-        onOk={handleDeleteConfirm}
-        state={modalState}
-        confirmLoading={confirmLoading}
-        messages={{
-          pending: {
-            title: "آیا مطمئن هستید؟",
-            description:
-              "آیا از حذف این واحد مطمئن هستید؟ این عملیات قابل بازگشت نیست.",
-            actionText: "حذف",
-          },
-          success: {
-            title: "واحد حذف شد",
-            description: "واحد با موفقیت از پایگاه داده حذف شد.",
-            actionText: "انجام شد",
-          },
-          error: {
-            title: "خطا در حذف",
-            description: "مشکلی پیش آمده است. لطفاً دوباره تلاش کنید.",
-            actionText: "تلاش مجدد",
-          },
-        }}
-      />
-
-      <Transition
-        appear
-        show={formModalOpen}
-        as={Dialog}
-        onClose={handleCloseFormModal}
-        className="fixed inset-0 z-100 flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
-      >
-        <TransitionChild
+      {/* Delete Confirmation Modal - Top Drawer Style */}
+      <Transition appear show={isDeleteOpen} as={Fragment}>
+        <Dialog
           as="div"
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-          className="absolute inset-0 bg-gray-900/50 transition-opacity dark:bg-black/40"
-        />
-
-        <TransitionChild
-          as={DialogPanel}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0 scale-95"
-          enterTo="opacity-100 scale-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100 scale-100"
-          leaveTo="opacity-0 scale-95"
-          className="relative w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6 shadow-xl transition-all dark:bg-dark-700"
+          className="relative z-100"
+          onClose={handleCloseDeleteModal}
         >
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-800 dark:text-dark-50">
-              {formMode === "create" && "افزودن واحد جدید"}
-              {formMode === "edit" && "ویرایش واحد"}
-            </h3>
-
-            <button
-              type="button"
-              onClick={handleCloseFormModal}
-              disabled={formLoading}
-              aria-disabled={formLoading}
-              className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-gray-300"
-            >
-              <XMarkIcon className="h-6 w-6" />
-            </button>
-          </div>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmitForm();
-            }}
-            className="space-y-4"
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <Input
-              label="نام واحد"
-              value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
-              error={formErrors.name}
-              disabled={formLoading}
-            />
+            <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity dark:bg-black/40" />
+          </TransitionChild>
 
-            <Input
-              label="نام کوتاه"
-              value={formData.shortName}
-              onChange={(e) => handleShortNameChange(e.target.value)}
-              error={formErrors.shortName}
-              disabled={formLoading}
-            />
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out transform-gpu transition-transform duration-200"
+            enterFrom="-translate-y-full"
+            enterTo="translate-y-0"
+            leave="ease-in transform-gpu transition-transform duration-200"
+            leaveFrom="translate-y-0"
+            leaveTo="-translate-y-full"
+          >
+            <DialogPanel className="fixed left-0 top-0 flex w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-dark-700">
+              <div className="flex justify-between bg-gray-200 px-4 py-3 dark:bg-dark-800 sm:px-5">
+                <DialogTitle
+                  as="h3"
+                  className="items-center text-base font-medium text-gray-800 dark:text-dark-100"
+                >
+                  {modalState === "pending" && "آیا مطمئن هستید؟"}
+                  {modalState === "success" && "واحد حذف شد"}
+                  {modalState === "error" && "خطا در حذف"}
+                </DialogTitle>
+                <Button
+                  onClick={handleCloseDeleteModal}
+                  variant="flat"
+                  className="size-7 shrink-0 rounded-full p-0 ltr:-mr-1.5 rtl:-ml-1.5"
+                  disabled={confirmLoading}
+                >
+                  <XMarkIcon className="size-4.5" />
+                </Button>
+              </div>
+              <div className="p-4">
+                {modalState === "pending" && (
+                  <p className="text-gray-600 dark:text-dark-300">
+                    آیا از حذف این واحد مطمئن هستید؟ این عملیات قابل بازگشت
+                    نیست.
+                  </p>
+                )}
+                {modalState === "success" && (
+                  <p className="text-green-600 dark:text-green-400">
+                    واحد با موفقیت از پایگاه داده حذف شد.
+                  </p>
+                )}
+                {modalState === "error" && (
+                  <p className="text-red-600 dark:text-red-400">
+                    مشکلی پیش آمده است. لطفاً دوباره تلاش کنید.
+                  </p>
+                )}
+              </div>
+              <div className="flex justify-end gap-2 bg-gray-50 px-4 py-3 dark:bg-dark-800 sm:px-5">
+                {modalState === "pending" && (
+                  <>
+                    <Button
+                      variant="outlined"
+                      onClick={handleCloseDeleteModal}
+                      disabled={confirmLoading}
+                    >
+                      لغو
+                    </Button>
+                    <Button
+                      color="error"
+                      onClick={handleDeleteConfirm}
+                      disabled={confirmLoading}
+                    >
+                      {confirmLoading ? "در حال حذف..." : "حذف"}
+                    </Button>
+                  </>
+                )}
+                {modalState !== "pending" && (
+                  <Button color="primary" onClick={handleCloseDeleteModal}>
+                    انجام شد
+                  </Button>
+                )}
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </Dialog>
+      </Transition>
 
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={formData.isActive ?? true}
-                onChange={handleActiveChange}
-                disabled={formLoading}
-              />
-              <span className="text-sm text-gray-700 dark:text-dark-300">
-                فعال
-              </span>
-            </div>
+      {/* Form Modal - Top Drawer Style */}
+      <Transition appear show={isFormOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-100" onClose={closeForm}>
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity dark:bg-black/40" />
+          </TransitionChild>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outlined"
-                onClick={handleCloseFormModal}
-                disabled={formLoading}
-                aria-disabled={formLoading}
-              >
-                لغو
-              </Button>
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out transform-gpu transition-transform duration-200"
+            enterFrom="-translate-y-full"
+            enterTo="translate-y-0"
+            leave="ease-in transform-gpu transition-transform duration-200"
+            leaveFrom="translate-y-0"
+            leaveTo="-translate-y-full"
+          >
+            <DialogPanel className="fixed left-0 top-0 flex w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-dark-700">
+              <div className="flex justify-between bg-gray-200 px-4 py-3 dark:bg-dark-800 sm:px-5">
+                <DialogTitle
+                  as="h3"
+                  className="items-center text-base font-medium text-gray-800 dark:text-dark-100"
+                >
+                  {formMode === "create" && "افزودن واحد جدید"}
+                  {formMode === "edit" && "ویرایش واحد"}
+                </DialogTitle>
+                <Button
+                  onClick={handleCloseFormModal}
+                  variant="flat"
+                  className="size-7 shrink-0 rounded-full p-0 ltr:-mr-1.5 rtl:-ml-1.5"
+                  disabled={formLoading}
+                >
+                  <XMarkIcon className="size-4.5" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmitForm();
+                  }}
+                  className="space-y-4"
+                >
+                  <Input
+                    label="نام واحد"
+                    value={formData.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    error={formErrors.name}
+                    disabled={formLoading}
+                  />
 
-              <Button
-                color="primary"
-                type="submit"
-                disabled={formLoading}
-                aria-busy={formLoading}
-              >
-                <span className="inline-flex items-center gap-2">
-                  {formLoading && (
-                    <span
-                      aria-hidden="true"
-                      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                  <Input
+                    label="نام کوتاه"
+                    value={formData.shortName}
+                    onChange={(e) => handleShortNameChange(e.target.value)}
+                    error={formErrors.shortName}
+                    disabled={formLoading}
+                  />
+
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      checked={formData.isActive ?? true}
+                      onChange={handleActiveChange}
+                      disabled={formLoading}
                     />
+                    <span className="text-sm text-gray-700 dark:text-dark-300">
+                      فعال
+                    </span>
+                  </div>
+
+                  {formModalState !== "pending" && (
+                    <div>
+                      {formModalState === "success" && (
+                        <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
+                          <p className="text-sm text-green-800 dark:text-green-200">
+                            {formMode === "create"
+                              ? "واحد با موفقیت ایجاد شد!"
+                              : "واحد با موفقیت به‌روزرسانی شد!"}
+                          </p>
+                        </div>
+                      )}
+
+                      {formModalState === "error" && (
+                        <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+                          <p className="text-sm text-red-800 dark:text-red-200">
+                            خطا در ذخیره واحد. لطفاً دوباره تلاش کنید.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   )}
-                  <span>{formLoading ? "در حال ذخیره..." : "ذخیره"}</span>
-                </span>
-              </Button>
-            </div>
-          </form>
-
-          {formModalState !== "pending" && (
-            <div className="mt-4">
-              {formModalState === "success" && (
-                <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
-                  <p className="text-sm text-green-800 dark:text-green-200">
-                    {formMode === "create"
-                      ? "واحد با موفقیت ایجاد شد!"
-                      : "واحد با موفقیت به‌روزرسانی شد!"}
-                  </p>
-                </div>
-              )}
-
-              {formModalState === "error" && (
-                <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
-                  <p className="text-sm text-red-800 dark:text-red-200">
-                    خطا در ذخیره واحد. لطفاً دوباره تلاش کنید.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </TransitionChild>
+                </form>
+              </div>
+              <div className="flex justify-end gap-2 bg-gray-50 px-4 py-3 dark:bg-dark-800 sm:px-5">
+                <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={handleCloseFormModal}
+                  disabled={formLoading}
+                >
+                  لغو
+                </Button>
+                <Button
+                  color="primary"
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmitForm();
+                  }}
+                  disabled={formLoading}
+                  isGlow={!formLoading}
+                >
+                  {formLoading ? "در حال ذخیره..." : "ذخیره"}
+                </Button>
+              </div>
+            </DialogPanel>
+          </TransitionChild>
+        </Dialog>
       </Transition>
     </Page>
   );
-}
