@@ -10,6 +10,14 @@ import {
   ImportPeriodRecipientsResponse,
 } from "@/app/services/endpoints/imports";
 import { getPeriods, PeriodItem } from "@/app/services/endpoints/periods";
+import {
+  Popover,
+  PopoverButton,
+  PopoverPanel,
+  Transition,
+} from "@headlessui/react";
+import { Fragment } from "react";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 type FilePondFileItem = {
   file?: File | Blob;
@@ -161,6 +169,92 @@ export default function Imports() {
             <h2 className="truncate text-xl font-medium tracking-wide text-gray-800 dark:text-dark-50">
               ایمپورت دریافت‌کنندگان دوره
             </h2>
+
+            <Popover className="relative">
+              <PopoverButton as={Button} variant="outlined" color="neutral" isIcon className="h-8 w-8">
+                <QuestionMarkCircleIcon className="size-5" />
+              </PopoverButton>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out"
+                enterFrom="opacity-0 translate-y-2"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-2"
+              >
+                <PopoverPanel
+                  anchor={{ to: "bottom end", gap: 8 }}
+                  className="z-100 w-96 rounded-md border border-gray-300 bg-white px-4 py-3 shadow-lg shadow-gray-200/50 outline-hidden ring-primary-500/50 focus-visible:outline-hidden focus-visible:ring-3 dark:border-dark-500 dark:bg-dark-750 dark:shadow-none"
+                >
+                  <h3 className="text-base font-medium tracking-wide text-gray-800 dark:text-dark-100">
+                    راهنمای ایمپورت دریافت‌کنندگان
+                  </h3>
+                  
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-700 dark:text-dark-200">
+                      این اندپوینت برای ایمپورت دریافت‌کنندگان یک دوره توزیع از فایل اکسل استفاده می‌شود.
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-dark-100">
+                      فیلدهای اجباری در اکسل:
+                    </h4>
+                    <ul className="mt-2 space-y-1 text-sm text-gray-700 dark:text-dark-200">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary-500"></span>
+                        <span><strong>personnelCode</strong> (یا personnel_code): کد پرسنلی - اجباری</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-primary-500"></span>
+                        <span><strong>fullName</strong> (یا full_name): نام و نام خانوادگی - اجباری</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="mt-4">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-dark-100">
+                      فیلدهای اختیاری:
+                    </h4>
+                    <ul className="mt-2 space-y-1 text-sm text-gray-700 dark:text-dark-200">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-gray-400"></span>
+                        <span><strong>companyCode/companyName</strong>: کد یا نام شرکت</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-gray-400"></span>
+                        <span><strong>status</strong>: وضعیت (ACTIVE, INACTIVE, CANCELED) - پیش‌فرض: ACTIVE</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-gray-400"></span>
+                        <span><strong>note</strong>: یادداشت</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="mt-4 rounded-md bg-amber-50 p-3 dark:bg-amber-900/20">
+                    <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                      نکات مهم:
+                    </h4>
+                    <ul className="mt-2 space-y-1 text-sm text-amber-700 dark:text-amber-300">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <span>کد پرسنلی تکراری در فایل مجاز نیست</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <span>کارمند نباید قبلاً در این دوره ثبت شده باشد</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="mt-1 size-1.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <span>دوره باید در وضعیت DRAFT یا RECIPIENTS_IMPORTED باشد</span>
+                      </li>
+                    </ul>
+                  </div>
+                </PopoverPanel>
+              </Transition>
+            </Popover>
           </div>
 
           <p className="text-sm text-gray-500 dark:text-dark-300">
