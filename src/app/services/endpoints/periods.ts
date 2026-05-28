@@ -145,12 +145,14 @@ export interface UpdatePeriodPayload {
 export interface CreatePeriodPackageItemPayload {
   itemId: string;
   quantity: string;
+  price: string;
   note?: string;
 }
 
 export interface UpdatePeriodPackageItemPayload {
   itemId?: string;
   quantity?: string;
+  price?: string;
   note?: string;
 }
 
