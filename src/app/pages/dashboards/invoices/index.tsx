@@ -321,29 +321,35 @@ export default function Invoices() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-right text-sm">
+              <table className="w-full min-w-[1200px] text-right text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 dark:border-dark-500">
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
                       شماره فاکتور
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
-                      نام کارمند
+                      عنوان دوره
+                    </th>
+                    <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
+                      نام خریدار
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
                       کد پرسنلی
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
-                      شرکت
+                      نام کالا/خدمت
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
-                      عنوان دوره
+                      واحد
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
-                      کد دوره
+                      تعداد
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
-                      تعداد آیتم‌ها
+                      قیمت واحد
+                    </th>
+                    <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
+                      جمع کل
                     </th>
                     <th className="px-3 py-3 font-medium text-gray-700 dark:text-dark-100">
                       تاریخ صدور
@@ -352,39 +358,113 @@ export default function Invoices() {
                 </thead>
 
                 <tbody>
-                  {invoices.map((invoice) => (
-                    <tr
-                      key={invoice.id}
-                      className="border-b border-gray-100 last:border-0 dark:border-dark-600"
-                    >
-                      <td className="px-3 py-3 text-gray-800 dark:text-dark-50">
-                        {invoice.invoiceNumber || "-"}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {invoice.employeeName || invoice.employee?.fullName || "-"}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {invoice.personnelCode ||
-                          invoice.employee?.personnelCode ||
-                          "-"}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {getCompanyName(invoice)}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {invoice.periodTitle || invoice.period?.title || "-"}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {invoice.periodCode || invoice.period?.code || "-"}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {invoice.totalItems ?? invoice.items?.length ?? 0}
-                      </td>
-                      <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
-                        {formatDateTime(invoice.issuedAt)}
-                      </td>
-                    </tr>
-                  ))}
+                  {invoices.map((invoice) => {
+                    const items = invoice.items || [];
+                    const hasItems = items.length > 0;
+
+                    if (!hasItems) {
+                      return (
+                        <tr
+                          key={invoice.id}
+                          className="border-b border-gray-100 last:border-0 dark:border-dark-600"
+                        >
+                          <td className="px-3 py-3 text-gray-800 dark:text-dark-50">
+                            {invoice.invoiceNumber || "-"}
+                          </td>
+                          <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                            {invoice.periodTitle || invoice.period?.title || "-"}
+                          </td>
+                          <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                            {invoice.employeeName || invoice.employee?.fullName || "-"}
+                          </td>
+                          <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                            {invoice.personnelCode ||
+                              invoice.employee?.personnelCode ||
+                              "-"}
+                          </td>
+                          <td className="px-3 py-3 text-gray-500 dark:text-dark-300 italic">
+                            بدون آیتم
+                          </td>
+                          <td className="px-3 py-3 text-gray-500 dark:text-dark-300 italic">
+                            -
+                          </td>
+                          <td className="px-3 py-3 text-gray-500 dark:text-dark-300 italic">
+                            -
+                          </td>
+                          <td className="px-3 py-3 text-gray-500 dark:text-dark-300 italic">
+                            -
+                          </td>
+                          <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                            {invoice.totalAmount || "0"}
+                          </td>
+                          <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                            {formatDateTime(invoice.issuedAt)}
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return items.map((item, index) => (
+                      <tr
+                        key={`${invoice.id}-${item.id}`}
+                        className={`border-b border-gray-100 last:border-0 dark:border-dark-600 ${
+                          index > 0 ? "bg-gray-50 dark:bg-dark-800/50" : ""
+                        }`}
+                      >
+                        {index === 0 && (
+                          <>
+                            <td
+                              rowSpan={items.length}
+                              className="px-3 py-3 text-gray-800 dark:text-dark-50 align-top"
+                            >
+                              {invoice.invoiceNumber || "-"}
+                            </td>
+                            <td
+                              rowSpan={items.length}
+                              className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
+                            >
+                              {invoice.periodTitle || invoice.period?.title || "-"}
+                            </td>
+                            <td
+                              rowSpan={items.length}
+                              className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
+                            >
+                              {invoice.employeeName || invoice.employee?.fullName || "-"}
+                            </td>
+                            <td
+                              rowSpan={items.length}
+                              className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
+                            >
+                              {invoice.personnelCode ||
+                                invoice.employee?.personnelCode ||
+                                "-"}
+                            </td>
+                            <td
+                              rowSpan={items.length}
+                              className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
+                            >
+                              {formatDateTime(invoice.issuedAt)}
+                            </td>
+                          </>
+                        )}
+                        <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                          {item.itemName || "-"}
+                        </td>
+                        <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                          {item.unitName || "-"}
+                        </td>
+                        <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                          {item.quantity || "0"}
+                        </td>
+                        <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
+                          {item.price ? `${Number(item.price).toLocaleString("fa-IR")} ریال` : "0"}
+                        </td>
+                        <td className="px-3 py-3 font-medium text-gray-800 dark:text-dark-50">
+                          {item.lineTotal ? `${Number(item.lineTotal).toLocaleString("fa-IR")} ریال` : "0"}
+                        </td>
+                      </tr>
+                    ));
+                  })}
                 </tbody>
               </table>
             </div>
