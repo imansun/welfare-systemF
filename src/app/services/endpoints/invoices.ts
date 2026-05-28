@@ -55,10 +55,11 @@ export interface InvoiceEmployee {
 
 export interface InvoiceLineItem {
   id: string;
-  invoice: string;
   itemName: string;
   unitName: string | null;
   quantity: string;
+  price: string;
+  lineTotal: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -74,6 +75,7 @@ export interface InvoiceItem {
   companyName: string | null;
   periodTitle: string;
   periodCode: string;
+  totalAmount: string;
   totalItems: number;
   items: InvoiceLineItem[];
   createdAt: string;
