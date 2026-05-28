@@ -36,6 +36,7 @@ import {
 } from "@/app/services/endpoints/periods";
 import { Combobox } from "@/components/shared/form/StyledCombobox";
 import { ItemItem, getItems } from "@/app/services/endpoints/items";
+import { useAuthContext } from "@/app/contexts/auth/context";
 
 type ModalMode = "create" | "edit" | null;
 type ModalState = "pending" | "success" | "error";
@@ -119,6 +120,7 @@ const getCurrentJalaliMonth = () => {
 };
 
 export default function Periods() {
+  const { user } = useAuthContext();
   const [periods, setPeriods] = useState<DistributionPeriod[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -139,6 +141,16 @@ export default function Periods() {
     description: "",
     createdById: "",
   });
+
+  // Set createdById from authenticated user when component mounts or user changes
+  useEffect(() => {
+    if (user?.id) {
+      setFormData((prev) => ({
+        ...prev,
+        createdById: user.id,
+      }));
+    }
+  }, [user]);
   const [formErrors, setFormErrors] = useState<PeriodFormErrors>({});
   const [formLoading, setFormLoading] = useState(false);
   const [formModalState, setFormModalState] =
@@ -184,7 +196,7 @@ export default function Periods() {
       year: getCurrentJalaliYear(),
       month: getCurrentJalaliMonth(),
       description: "",
-      createdById: "",
+      createdById: user?.id || "",
     });
     setFormErrors({});
     setFormModalState("pending");
@@ -421,8 +433,9 @@ export default function Periods() {
       errors.month = "ماه معتبر انتخاب کنید";
     }
 
+    // createdById is now automatically set from authenticated user, no validation needed
     if (!formData.createdById.trim()) {
-      errors.createdById = "شناسه ایجادکننده الزامی است";
+      errors.createdById = "کاربر لاگین شده یافت نشد";
     }
 
     setFormErrors(errors);
@@ -966,7 +979,8 @@ export default function Periods() {
                   handlePeriodInputChange("createdById", e.target.value)
                 }
                 error={formErrors.createdById}
-                disabled={formLoading}
+                disabled={formLoading || !!user?.id}
+                placeholder={user?.id ? "کاربر لاگین شده" : ""}
               />
             </div>
 
