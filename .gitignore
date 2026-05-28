@@ -1,66 +1,52 @@
-```gitignore
+```
 # Dependencies
 node_modules/
 .pnpm-store/
+.npm/
 .yarn/
-yarn.lock
-package-lock.json
-
-# Build outputs
-dist/
-build/
-.next/
-.nuxt/
-out/
-public/build/
-
-# Environment variables
-.env
+__pycache__/
+*.egg-info/
+dist-packages/
+site-packages/
+venv/
+.env/
 .env.local
 .env.*
-!.env.example
+.venv/
 
-# IDE specific
+# Build outputs
+build/
+dist/
+target/
+out/
+_output/
+_coverage/
+htmlcov/
+.mypy_cache/
+.pytest_cache/
+.nyc_output/
+coverage/
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+*.tmp
+*.log
 
-# OS generated files
+# OS files
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Python specific (if applicable)
-__pycache__/
+# Compiled files
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.cache/
-.pytest_cache/
-.mypy_cache/
-
-# Temporary files
-*.tmp
-*.temp
-*~
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 ```
-
-Wait, I need to reconsider this. Looking at the changes again - only `src/app/pages/dashboards/periods/index.tsx` was modified, which is a TypeScript React file. There are no build artifacts, dependency directories, or temporary files in the change list.
-
-(empty)
