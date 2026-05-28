@@ -166,6 +166,7 @@ export default function Periods() {
     useState<PackageItemFormData>({
       itemId: "",
       quantity: "",
+      price: "",
       note: "",
     });
   const [packageItemFormErrors, setPackageItemFormErrors] =
@@ -196,6 +197,7 @@ export default function Periods() {
     setPackageItemFormData({
       itemId: "",
       quantity: "",
+      price: "",
       note: "",
     });
     setPackageItemFormErrors({});
@@ -532,6 +534,7 @@ export default function Periods() {
     setPackageItemFormData({
       itemId: packageItem.item?.id ?? "",
       quantity: packageItem.quantity ?? "",
+      price: packageItem.price ?? "",
       note: packageItem.note ?? "",
     });
     console.log("✅ [EDIT PACKAGE ITEM] Edit form populated with data");
@@ -585,6 +588,10 @@ export default function Periods() {
       errors.quantity = "مقدار الزامی است";
     }
 
+    if (!packageItemFormData.price.trim()) {
+      errors.price = "قیمت الزامی است";
+    }
+
     setPackageItemFormErrors(errors);
 
     return Object.keys(errors).length === 0;
@@ -614,6 +621,7 @@ export default function Periods() {
       const payload: CreatePeriodPackageItemPayload = {
         itemId: packageItemFormData.itemId.trim(),
         quantity: packageItemFormData.quantity.trim(),
+        price: packageItemFormData.price.trim(),
         note: packageItemFormData.note?.trim() || undefined,
       };
       console.log("📦 [SUBMIT PACKAGE ITEM FORM] Prepared payload:", payload);
@@ -1098,7 +1106,7 @@ export default function Periods() {
                 }}
                 className="space-y-4"
               >
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-4">
                   <Combobox
                     data={availableItems}
                     displayField="name"
@@ -1118,6 +1126,17 @@ export default function Periods() {
                       handlePackageItemInputChange("quantity", e.target.value)
                     }
                     error={packageItemFormErrors.quantity}
+                    disabled={packageItemFormLoading}
+                  />
+
+                  <Input
+                    label="قیمت (ریال)"
+                    type="number"
+                    value={packageItemFormData.price}
+                    onChange={(e) =>
+                      handlePackageItemInputChange("price", e.target.value)
+                    }
+                    error={packageItemFormErrors.price}
                     disabled={packageItemFormLoading}
                   />
 
@@ -1177,6 +1196,7 @@ export default function Periods() {
                   <Th>نام کالا</Th>
                   <Th>واحد</Th>
                   <Th>مقدار</Th>
+                  <Th>قیمت (ریال)</Th>
                   <Th>یادداشت</Th>
                   <Th>تاریخ ایجاد</Th>
                   <Th>عملیات</Th>
@@ -1186,13 +1206,13 @@ export default function Periods() {
               <TBody>
                 {packageItemsLoading ? (
                   <Tr>
-                    <Td colSpan={6} className="py-4 text-center">
+                    <Td colSpan={7} className="py-4 text-center">
                       در حال بارگذاری...
                     </Td>
                   </Tr>
                 ) : packageItems.length === 0 ? (
                   <Tr>
-                    <Td colSpan={6} className="py-4 text-center">
+                    <Td colSpan={7} className="py-4 text-center">
                       هیچ آیتمی برای این دوره ثبت نشده است
                     </Td>
                   </Tr>
@@ -1202,6 +1222,7 @@ export default function Periods() {
                       <Td>{packageItem.item?.name ?? "-"}</Td>
                       <Td>{packageItem.item?.unit?.shortName ?? "-"}</Td>
                       <Td>{packageItem.quantity}</Td>
+                      <Td>{packageItem.price ? Number(packageItem.price).toLocaleString() : "-"}</Td>
                       <Td>{packageItem.note ?? "-"}</Td>
                       <Td>
                         {packageItem.createdAt

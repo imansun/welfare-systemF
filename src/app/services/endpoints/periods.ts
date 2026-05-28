@@ -115,6 +115,7 @@ export interface PeriodPackageItem {
   period: DistributionPeriod;
   item: PeriodItem;
   quantity: string;
+  price: string;
   note: string | null;
   createdAt: string;
   updatedAt: string;
