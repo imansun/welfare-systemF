@@ -463,6 +463,7 @@ export default function Invoices() {
                             {formatDateTime(invoice.issuedAt)}
                           </td>
                         )}
+                      </>
                       </tr>
                     ));
                   })}
