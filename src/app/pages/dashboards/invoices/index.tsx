@@ -439,13 +439,6 @@ export default function Invoices() {
                                 invoice.employee?.personnelCode ||
                                 "-"}
                             </td>
-                            <td
-                              rowSpan={items.length}
-                              className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
-                            >
-                              {formatDateTime(invoice.issuedAt)}
-                            </td>
-                          </>
                         )}
                         <td className="px-3 py-3 text-gray-700 dark:text-dark-100">
                           {item.itemName || "-"}
@@ -462,6 +455,14 @@ export default function Invoices() {
                         <td className="px-3 py-3 font-medium text-gray-800 dark:text-dark-50">
                           {item.lineTotal ? `${Number(item.lineTotal).toLocaleString("fa-IR")} ریال` : "0"}
                         </td>
+                        {index === 0 && (
+                          <td
+                            rowSpan={items.length}
+                            className="px-3 py-3 text-gray-700 dark:text-dark-100 align-top"
+                          >
+                            {formatDateTime(invoice.issuedAt)}
+                          </td>
+                        )}
                       </tr>
                     ));
                   })}
