@@ -500,7 +500,7 @@ export default function Invoices() {
                 value={selectedPeriodId}
                 onChange={(e) => void handlePeriodChange(e.target.value)}
                 disabled={periodsLoading || !!periodsError || generateLoading}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-500 dark:bg-dark-800 dark:text-dark-50"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-dark-500 dark:bg-dark-800 dark:text-dark-50"
               >
                 <option value="">
                   {periodsLoading
@@ -553,7 +553,7 @@ export default function Invoices() {
 
                 <Button
                   variant="outlined"
-                  color="primary"
+                  color="blue"
                   onClick={() => void handleExportPeriodInvoices()}
                   disabled={exportButtonDisabled}
                   aria-disabled={exportButtonDisabled}
@@ -578,7 +578,7 @@ export default function Invoices() {
                 </Button>
 
                 <Button
-                  color="primary"
+                  color="blue"
                   isGlow
                   onClick={() => void handleGenerateInvoices()}
                   disabled={generateButtonDisabled}
@@ -644,7 +644,7 @@ export default function Invoices() {
             </h3>
 
             {selectedPeriodId && !invoicesLoading && !invoicesError && (
-              <Badge color="primary">{invoices.length} فاکتور</Badge>
+              <Badge color="blue">{invoices.length} فاکتور</Badge>
             )}
           </div>
 
