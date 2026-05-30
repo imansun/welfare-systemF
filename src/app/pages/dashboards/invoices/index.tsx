@@ -553,7 +553,7 @@ export default function Invoices() {
 
                 <Button
                   variant="outlined"
-                  color="blue"
+                  color="primary"
                   onClick={() => void handleExportPeriodInvoices()}
                   disabled={exportButtonDisabled}
                   aria-disabled={exportButtonDisabled}
@@ -578,7 +578,7 @@ export default function Invoices() {
                 </Button>
 
                 <Button
-                  color="blue"
+                  color="primary"
                   isGlow
                   onClick={() => void handleGenerateInvoices()}
                   disabled={generateButtonDisabled}
@@ -644,7 +644,7 @@ export default function Invoices() {
             </h3>
 
             {selectedPeriodId && !invoicesLoading && !invoicesError && (
-              <Badge color="blue">{invoices.length} فاکتور</Badge>
+              <Badge color="primary">{invoices.length} فاکتور</Badge>
             )}
           </div>
 

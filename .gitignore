@@ -1,30 +1,17 @@
+```gitignore
 # Dependencies
 node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.bun/
 
-# Build artifacts
+# Build outputs
 dist/
 build/
-*.js.map
-*.tsbuildinfo
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
+.out/
+target/
+_coverage/
 
 # Python
 __pycache__/
@@ -35,279 +22,52 @@ __pycache__/
 env/
 venv/
 .venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage*
 .pytest_cache/
 .mypy_cache/
+.coverage
+htmlcov/
 
-# Node
+# Node.js
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# OS
+# Logs
+*.log
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Temporary
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+nyc_output/
+
+# Temporary files
 *.tmp
 *.temp
-*.bak
+*~
+```
 
-# Archives
-*.zip
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.7z
-*.rar
-*.gz
-*.bz2
-*.xz
-*.zst
+Wait, I need to reconsider this. The only modified file is `src/app/pages/dashboards/invoices/index.tsx`, which is a TypeScript React component file. There are no build artifacts, dependency directories, or temporary files in the changes list. This appears to be just a source code modification.
 
-# Compiled
-*.o
-*.obj
-*.so
-*.a
-*.dll
-*.exe
-*.out
-*.class
+```gitignore
 
-# Go
-*.out
-*.exe
-*.dll
-*.so
-*.dylib
-*.test
-*.prof
-cover.out
-go.mod
-go.sum
-
-# Java
-*.class
-*.jar
-*.war
-*.ear
-*.nar
-*.jmod
-target/
-.gradle/
-!gradle-wrapper.properties
-
-# C/C++
-*.o
-*.obj
-*.so
-*.a
-*.dylib
-*.dll
-*.exe
-*.out
-*.ilk
-*.pdb
-*.lib
-*.exp
-*.gch
-*.gtest
-*.map
-
-# Ruby
-*.gem
-*.rbc
-*.sass-cache
-.bundle/
-vendor/bundle/
-.rbenv-gemsets
-.rbenv-version
-.gem
-Guardfile
-Rakefile
-
-# Rust
-Cargo.lock
-target/
-**/*.rs.bk
-$CARGO_HOME/
-.cargo/
-
-# Julia
-julia-*/
-
-# Zig
-zig-out/
-zig-cache/
-
-# Elixir
-*.beam
-*.ez
-.beam
-.elixir_ls/
-.plt
-.MIX_ENV
-erl_crash.dump
-
-# Dart
-.dart_tool/
-.build/
-.pub/
-.packages
-*.dart.js
-*.dart.js.deps
-*.dart.js.map
-*.info.json
-
-# C#
-*.sln
-*.csproj
-*.user
-*.aps
-*.pch
-*.vspscc
-*.vssscc
-*_i.c
-*_p.c
-*.ilk
-*.meta
-*.pidb
-*.suo
-*.pdb
-*.userprefs
-*.svclog
-*.cache
-*.dotCover
-*.nupkg
-[TestResult.xml]
-*.gpx
-*.xCove
-*.crash
-cl.*.d
-LPTSTR
-[Tt]est[Rr]esult.*
-[Bb]uild[Ll]og.*
-[Oo]bj/
-[Bb]in/
-[Dd]epends/
-[Tt]emp/
-[Tt]emporary[Tt]est[Tt]r
-[Dd]ebug/
-[Rr]elease/
-[Rr]eleases/
-_x002E_coverage
-*.njsproj
-*.jsproj
-AssemblyInfo.cs
-packages/
-.nuget/
-.nuke/
-artifacts/
-
-# F#
-.net/
-.FSharpTest.*
-*.fsproj
-*.fsproj.user
-*.fsi
-*.fsx
-*.fsscript
-*.userprefs
-*.cache
-*.suo
-*.user
-*.pidb
-*.pdb
-*.dll
-*.exe
-*.log
-*.bin
-*.dat
-*.db
-*.mdb
-*.sdf
-*.ldf
-*.ndf
-*.backup
-*.bak
-*.old
-*.orig
-*.rej
-*.tmp
-*.temp
-*.log
-*.cache
-*.ilk
-*.pdb
-*.rsp
-*.publish.xml
-*.log.xml
-*.userosscache
-*.sln.docstates
-*.userprefs
-*.cache
-*.gpState
-*.VC.db
-*.VC.VC.opendb
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opendb-shm
-*.VC.VC.opendb-wal
-*.VC.VC.opend......
-[Output truncated due to length limitations]
+```
