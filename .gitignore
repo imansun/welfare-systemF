@@ -1,10 +1,35 @@
 ```gitignore
-# Logs and temp files
-*.log
-*.tmp
-*.swp
+# Dependencies
+node_modules/
 
-# Environment
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.ENV.*
+.python-version
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage/
+htmlcov/
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+
+# Environment variables
 .env
 .env.local
 .env.*
@@ -12,38 +37,13 @@
 # Editors
 .vscode/
 .idea/
-
-# Dependencies
-node_modules/
-.venv/
-venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-dist/
-build/
-target/
-.gradle/
+*.swp
+*.swo
+*.tmp
 
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Compiled files
-*.pyc
-*.class
-*.o
-*.exe
-*.dll
-*.so
-*.a
-*.obj
-*.out
 
 # Compressed files
 *.zip

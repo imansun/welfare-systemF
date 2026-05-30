@@ -114,7 +114,7 @@ function PrintableInvoice({ invoice }: PrintableInvoiceProps) {
     >
       <div className="flex items-start justify-between gap-8">
         <div>
-          <h2 className="text-2xl font-semibold text-primary-600">
+          <h2 className="text-2xl font-semibold" style={{ color: "#2563eb" }}>
             فاکتور فروش
           </h2>
           <div className="mt-3 space-y-1 text-sm text-gray-600">
@@ -249,7 +249,7 @@ function PrintableInvoice({ invoice }: PrintableInvoiceProps) {
       <div className="mt-8 flex justify-end">
         <div className="w-72 rounded-lg bg-gray-50 p-5">
           <p className="text-sm text-gray-500">جمع کل فاکتور</p>
-          <p className="mt-2 text-xl font-semibold text-primary-600">
+          <p className="mt-2 text-xl font-semibold" style={{ color: "#2563eb" }}>
             {formatCurrency(invoice.totalAmount)}
           </p>
         </div>
